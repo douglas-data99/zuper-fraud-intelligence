@@ -1,4 +1,4 @@
-// Prints reais: MLflow (local, mesmo banco publicado na VPS) e as 5 páginas no ar.
+// Prints reais: MLflow (local) e as 7 páginas da interface (SITE=http://localhost:3000 para o build local).
 // Uso: node prints.mjs [mlflow|site|tudo]
 import { chromium } from "playwright-core";
 import { mkdirSync } from "node:fs";
@@ -33,24 +33,35 @@ if (modo === "mlflow" || modo === "tudo") {
 }
 
 if (modo === "site" || modo === "tudo") {
-  for (const [rota, nome, extra] of [["/", "01-centro-operacoes", 5000], ["/decisao", "03-motor-decisao", 3500], ["/lab", "04-data-science-lab", 4500], ["/mlops", "05-mlops", 6000]]) {
+  // tela inicial: apresentação no meio (etapa 6, Motor de decisão) e no fim
+  await page.goto(`${SITE}/`, { waitUntil: "networkidle" });
+  await espera(1500);
+  for (let k = 0; k < 6; k++) await page.keyboard.press("ArrowRight");
+  await page.mouse.move(5, 5);
+  await espera(1200);
+  await page.screenshot({ path: `${OUT}/00-como-funciona-etapa6.png` });
+  for (let k = 0; k < 14; k++) await page.keyboard.press("ArrowRight");
+  await page.getByRole("button", { name: "Iniciar apresentação" }).click();   // na última etapa, continua até concluir
+  await page.mouse.move(5, 5);
+  await espera(4200);
+  await page.screenshot({ path: `${OUT}/00-como-funciona-fim.png` });
+  for (const [rota, nome, extra] of [["/operacoes", "01-centro-operacoes", 5000], ["/decisao", "03-motor-decisao", 3500], ["/lab", "04-data-science-lab", 4500],
+                                       ["/monitoramento", "05-monitoramento", 4000], ["/mlops", "06-mlops", 6000]]) {
     await page.goto(`${SITE}${rota}`, { waitUntil: "networkidle" });
     await espera(extra);
     await page.screenshot({ path: `${OUT}/${nome}.png` });
     await page.screenshot({ path: `${OUT}/${nome}-inteira.png`, fullPage: true });
   }
-  // simulador: cenário atípico -> pagamento real pela API
+  // simulador: só what-if (nada é gravado)
   await page.goto(`${SITE}/simulador`, { waitUntil: "networkidle" });
   await espera(3500);
   await page.screenshot({ path: `${OUT}/02-simulador-inicio.png` });
-  for (const [botao, nome] of [["Habitual", "02-simulador-habitual"], ["Atípico", "02-simulador-atipico"], ["Ambíguo", "02-simulador-ambiguo"]]) {
-    await page.getByRole("button", { name: new RegExp(`^${botao}`) }).click();
-    await espera(2500);
-    await page.getByRole("button", { name: "Efetuar pagamento" }).click();
-    await espera(9000);
-    await page.screenshot({ path: `${OUT}/${nome}.png` });
-    await page.screenshot({ path: `${OUT}/${nome}-inteira.png`, fullPage: true });
-  }
+  await page.getByRole("group", { name: "Cenários reproduzíveis" }).getByRole("button", { name: /^Atípico/ }).click();
+  await espera(2500);
+  await page.getByRole("button", { name: "Simular sem gravar (what-if)" }).click();
+  await espera(5000);
+  await page.screenshot({ path: `${OUT}/02-simulador-atipico-whatif.png` });
+  await page.screenshot({ path: `${OUT}/02-simulador-atipico-whatif-inteira.png`, fullPage: true });
 }
 await browser.close();
 console.log("prints ok");

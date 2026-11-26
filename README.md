@@ -6,12 +6,24 @@
 
 | | |
 |---|---|
-| **Aplicação** | https://fraude-analytics.zuperdata.com.br (6 páginas: visão executiva, simulador bancário, motor de decisão, Data Science Lab, monitoramento do modelo e MLOps) |
+| **Aplicação** | https://fraude-analytics.zuperdata.com.br (7 páginas: "Como funciona" na tela inicial, Centro de operações em `/operacoes`, simulador bancário, motor de decisão, Data Science Lab, monitoramento do modelo e MLOps) |
 | **API** | https://api-fraude.zuperdata.com.br/docs (FastAPI, VPS própria) |
 | **Vídeo (4 min)** | [Apresentação do projeto](https://github.com/douglas-data99/zuper-fraud-intelligence/releases/tag/v1.0) (prints reais, narração) |
 | **Evidências** | `reports/` (métricas, curvas, testes, carga) · `docs/prints/` (prints reais) · `docs/DIARIO.md` (como foi feito, incluindo os erros) |
 
-![Centro de operações](docs/prints/01-centro-operacoes.png)
+![Como funciona: a arquitetura apresentada etapa por etapa](docs/prints/00-como-funciona-etapa6.png)
+
+## Interface
+
+A tela inicial apresenta a arquitetura em três faixas: operação em tempo real, dados e MLOps, decisão e impacto. Ela avança etapa por etapa, com 3 s por etapa, pausa com o mouse e navegação manual.
+
+Essa animação é **ilustrativa**. A inferência real acontece no simulador, que chama a API.
+
+O design segue uma composição editorial, com seções em linhas e poucas caixas. As cores têm significado fixo: verde para ação, menta para proteção, âmbar para verificação, coral para risco e azul-aço para a parte técnica. As animações só aparecem para explicar um processo.
+
+| Centro de operações | Simulador bancário (what-if) | Monitoramento do modelo |
+|---|---|---|
+| ![Centro de operações](docs/prints/01-centro-operacoes.png) | ![Simulador](docs/prints/02-simulador-atipico-whatif.png) | ![Monitoramento](docs/prints/05-monitoramento.png) |
 
 ## O problema de negócio
 

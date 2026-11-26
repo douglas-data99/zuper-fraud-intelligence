@@ -11,6 +11,18 @@
 | Portfólio | https://zuperdata.com.br/douglas-portifolio · código em https://github.com/douglas-data99/portfolio |
 | Vídeo explicativo | https://github.com/douglas-data99/zuper-fraud-intelligence/releases/tag/v1.0 · cópia em `Vídeos/Zuper/Zuper Fraud Intelligence/` |
 
+## Redesign v2 (26/11/2026, tarde): na branch `redesign-v2`, aguardando aprovação
+
+- **O que mudou:**
+  - nova tela inicial, "Como funciona", com a arquitetura interativa;
+  - o Centro de operações passou para `/operacoes`;
+  - as 7 páginas foram refeitas no design system v2, a direção "sala de controle de risco": composição editorial, menos caixas, paleta com significado;
+  - o roadmap do que não está implementado saiu da página de MLOps.
+- **Evidências** em `docs/redesign-v2/`: prints de antes e depois (1440, 1920 e 390 px) e `verificacao.json` com **50/50** checagens no navegador. Os **41/41** testes automatizados passaram.
+- **Bug corrigido:** o relógio da apresentação lia o quadro anterior depois de ele já ter sido atualizado, e cada etapa durava cerca de 6 s em vez de 3. Foi pego pelo teste automatizado.
+- **Não muda:** modelo, cortes, premissas, dados, API e infraestrutura.
+- **Prints atualizados:** `docs/prints/`, de `00-*` a `06-*`.
+
 ## O que está pronto (implementado e testado)
 
 | Item | Estado | Evidência |
