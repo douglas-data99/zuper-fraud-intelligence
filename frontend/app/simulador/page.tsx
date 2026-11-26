@@ -10,6 +10,7 @@ type Cenario = { tipo: string; descricao: string; card_key: string; merchant: st
 type Loja = { merchant: string; categoria: string };
 type Resp = any;
 
+const VALOR_MAX = 30000; // limite da API (backend/app/main.py)
 const LOCAIS: Record<string, string> = { perto_de_casa: "Perto de casa", cidade_vizinha: "Cidade vizinha (~50 km)", outro_estado: "Outro estado (~1.000 km)" };
 const NOME_CEN: Record<string, string> = { habitual: "Habitual", ambiguo: "Ambíguo", atipico: "Atípico" };
 
@@ -126,6 +127,10 @@ export default function Simulador() {
   const pctScore = (v: number) => fmt.pct(v, v < 0.01 ? 2 : 1);
   const media30 = perfil?.ultimos_30d?.media;
   const razao = media30 ? Number(form.amount_usd) / media30 : null;
+  // mesmas regras da API (amount_usd > 0 e <= 30000; hora inteira de 0 a 23): avisar antes de enviar
+  const valorOk = Number(form.amount_usd) > 0 && Number(form.amount_usd) <= VALOR_MAX;
+  const horaOk = Number.isInteger(Number(form.hora)) && Number(form.hora) >= 0 && Number(form.hora) <= 23;
+  const entradaOk = valorOk && horaOk;
   const TITULO: Record<string, string> = { aprovar: "Pagamento aprovado", autenticar: "Confirme que é você", investigar: "Pagamento em análise" };
   const ICONE: Record<string, string> = { aprovar: "M5 12.5l4.5 4.5L19 7.5", autenticar: "M12 7v6m0 4h.01", investigar: "M12 8v5m-6 7h12a2 2 0 0 0 1.7-3L13.7 5a2 2 0 0 0-3.4 0L4.3 17A2 2 0 0 0 6 20z" };
   const loja = lojas.find((l) => l.merchant === form.merchant);
@@ -178,7 +183,8 @@ export default function Simulador() {
                   <span>US$</span>
                   <input id="valor" type="number" min={1} max={30000} step="0.01" value={form.amount_usd} onChange={(e) => setForm({ ...form, amount_usd: Number(e.target.value) })} />
                 </div>
-                {razao != null && <p className={s.dicaValor}>A média deste cliente nos últimos 30 dias é {fmt.usd(media30, 2)}.</p>}
+                {!valorOk ? <p className={s.dicaValor} role="alert" style={{ color: "var(--risco)" }}>{Number(form.amount_usd) > VALOR_MAX ? `O valor máximo desta demonstração é ${fmt.usd(VALOR_MAX)}: a maior compra da base é de ${fmt.usd(28948.9, 2)} e o modelo não foi treinado além disso.` : "Informe um valor maior que zero."}</p>
+                  : razao != null && <p className={s.dicaValor}>A média deste cliente nos últimos 30 dias é {fmt.usd(media30, 2)}.</p>}
 
                 <div className={s.lista}>
                   <div className={s.item}>
@@ -190,7 +196,7 @@ export default function Simulador() {
                   <div className={s.itemDuplo}>
                     <div className={s.item}>
                       <label htmlFor="hora">Horário</label>
-                      <input id="hora" type="number" min={0} max={23} value={form.hora} onChange={(e) => setForm({ ...form, hora: Number(e.target.value) })} />
+                      <input id="hora" type="number" min={0} max={23} aria-invalid={!horaOk} style={horaOk ? undefined : { color: "var(--risco)" }} value={form.hora} onChange={(e) => setForm({ ...form, hora: Number(e.target.value) })} />
                     </div>
                     <div className={s.item}>
                       <label htmlFor="local">Onde fica a loja</label>
@@ -202,10 +208,10 @@ export default function Simulador() {
                 </div>
 
                 <div className={s.appAcoes}>
-                  <button className={`primario ${s.pagar}`} disabled={!card || !form.merchant || carregando} onClick={() => enviar(true)}>
+                  <button className={`primario ${s.pagar}`} disabled={!card || !form.merchant || carregando || !entradaOk} onClick={() => enviar(true)}>
                     {carregando ? "Processando…" : `Pagar ${fmt.usd(Number(form.amount_usd), 2)}`}
                   </button>
-                  <button className={`fantasma ${s.whatif}`} disabled={!card || !form.merchant || carregando} onClick={() => enviar(false)}>Simular sem gravar (what-if)</button>
+                  <button className={`fantasma ${s.whatif}`} disabled={!card || !form.merchant || carregando || !entradaOk} onClick={() => enviar(false)}>Simular sem gravar (what-if)</button>
                 </div>
               </div>
             ) : (

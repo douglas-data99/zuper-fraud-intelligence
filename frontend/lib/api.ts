@@ -23,7 +23,7 @@ export async function api<T>(caminho: string, init?: RequestInit & { timeoutMs?:
     const corpo = await r.json().catch(() => ({}));
     if (!r.ok) {
       const d = corpo?.detail;
-      throw new ErroApi(r.status, d?.codigo || "erro", d?.mensagem || (Array.isArray(d) ? "dados inválidos" : `HTTP ${r.status}`));
+      throw new ErroApi(r.status, d?.codigo || "erro", d?.mensagem || (Array.isArray(d) ? "A API recusou os dados enviados (confira o valor, até US$ 30.000, e o horário, de 0 a 23)" : `HTTP ${r.status}`));
     }
     return corpo as T;
   } catch (e) {
