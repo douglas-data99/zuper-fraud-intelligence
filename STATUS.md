@@ -4,8 +4,8 @@
 
 | | |
 |---|---|
-| Aplicação | https://zuper-fraud-intelligence.vercel.app |
-| API | https://zfi-api.2-29-40-32.sslip.io (provisório; documentação em `/docs`) |
+| Aplicação | https://fraude-analytics.zuperdata.com.br |
+| API | https://api-fraude.zuperdata.com.br (provisório; documentação em `/docs`) |
 | Código | https://github.com/douglas-data99/zuper-fraud-intelligence |
 | Estudo BAF | https://github.com/douglas-data99/deteccao-fraude-abertura-de-contas |
 | Portfólio | https://zuperdata.com.br/douglas-portifolio · código em https://github.com/douglas-data99/portfolio |
@@ -39,11 +39,7 @@
 
 ## Pendências para o Douglas (precisam de você)
 
-1. **DNS na Hostinger** (eu não tinha acesso). Crie os dois registros:
-   - `A  api-fraude → 2.29.40.32`
-   - `CNAME  fraude → cname.vercel-dns.com`
-
-   Depois me avise: eu adiciono o domínio na Vercel, troco a URL da API e acrescento `api-fraude.zuperdata.com.br` no Caddy.
+1. ~~DNS na Hostinger~~ feito em 26/11: `fraude-analytics` (Vercel) e `api-fraude` (VPS, Caddy com HTTPS). O endereço antigo `zuper-fraud-intelligence.vercel.app` continua funcionando.
 2. **Chave órfã no Redis do WhatsApp** (incidente explicado no DIARIO). Opcional, porque a chave é pequena e não interfere:
    `docker exec evolution-redis-1 redis-cli DEL fraud:replay:comando`
 3. **Commit no repositório SITES:**

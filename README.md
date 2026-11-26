@@ -6,8 +6,8 @@
 
 | | |
 |---|---|
-| **Aplicação** | https://zuper-fraud-intelligence.vercel.app (5 páginas: operações, simulador, motor de decisão, Data Science Lab e MLOps) |
-| **API** | https://zfi-api.2-29-40-32.sslip.io/docs (FastAPI, VPS própria) |
+| **Aplicação** | https://fraude-analytics.zuperdata.com.br (5 páginas: operações, simulador, motor de decisão, Data Science Lab e MLOps) |
+| **API** | https://api-fraude.zuperdata.com.br/docs (FastAPI, VPS própria) |
 | **Vídeo (4 min)** | [Apresentação do projeto](https://github.com/douglas-data99/zuper-fraud-intelligence/releases/tag/v1.0) (prints reais, narração) |
 | **Evidências** | `reports/` (métricas, curvas, testes, carga) · `docs/prints/` (prints reais) · `docs/DIARIO.md` (como foi feito, incluindo os erros) |
 
