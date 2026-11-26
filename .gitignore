@@ -1,0 +1,22 @@
+# dados, segredos e artefatos (nunca no git)
+data/
+secrets/
+.env
+.env.*
+!.env.example
+artifacts/
+mlruns/
+mlflow.db
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+node_modules/
+.next/
+.vercel/
+video/_build/
+
+# especificação interna (cita o benchmark de terceiros; não vai para o repositório público)
+docs/ESPECIFICACAO.md
+*.tsbuildinfo
+reports/metrics/train_log.txt

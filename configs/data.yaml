@@ -1,0 +1,23 @@
+# Fonte, camadas e splits. Tudo que muda o resultado fica aqui, versionado.
+gcp:
+  project: zuper-fraud-intelligence
+  dataset: fraud_intelligence
+  location: US
+  max_bytes_billed: 5368709120   # 5 GiB por consulta (trava extra além da cota diária de 20 GiB)
+source:
+  kaggle: kartik2112/fraud-detection
+  license: CC0-1.0
+  files:
+    fraudTrain.csv: fd7139200dbfcbed0b6742bbe05a4f1abce532c4fef20918228a651647a3e75d
+    fraudTest.csv: 12d553ab19440c752d2531ee1af44bb64f12cc3d3839f1649f19e81c230545f0
+  currency: USD                     # documentação do gerador Sparkov (EUA)
+  timezone: desconhecido            # timestamps usados como estão (horário local implícito)
+pseudonymization:
+  salt_env: CARD_SALT               # sal do hash do cartão; definido no .env, fora do git
+splits:                             # limites em horário do evento (inclusivo no início, exclusivo no fim)
+  warmup:      ["2019-01-01", "2019-02-01"]   # só forma histórico; não entra no treino
+  train:       ["2019-02-01", "2020-01-01"]
+  tuning:      ["2020-01-01", "2020-03-01"]   # early stopping e escolha de modelo
+  calibration: ["2020-03-01", "2020-05-01"]   # calibrador
+  policy:      ["2020-05-01", "2020-06-21 12:14:00"]  # cortes de decisão por custo
+  test:        ["2020-06-21 12:14:00", "2021-01-01"]  # arquivo de teste original, intocado até o fim

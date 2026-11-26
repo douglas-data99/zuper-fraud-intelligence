@@ -1,0 +1,14 @@
+# Política financeira em 3 níveis. TODOS os valores são HIPÓTESES editáveis (USD, mesma moeda da base),
+# não dados de um banco real. A otimização usa a janela "policy"; o teste só recebe a política congelada.
+versao: policy-v1
+moeda: USD
+acoes:
+  aprovar:     {custo_acao: 0.00, atrito_legitimo: 0.00, eficacia: 0.00}
+  autenticar:  {custo_acao: 0.30, atrito_legitimo: 1.00, eficacia: 0.70}   # OTP/confirmação: custo do envio, risco de abandono, 70% das fraudes barradas
+  investigar:  {custo_acao: 8.00, atrito_legitimo: 10.00, eficacia: 0.95}  # analista revisa; cliente bom fica com o pagamento retido
+capacidade_investigacao_max: 0.01   # no máximo 1% das transações vai para a fila de investigação
+grade_cortes: 300                   # quantis de score avaliados (força bruta em pares t_auth <= t_review)
+sensibilidade:                      # multiplicadores aplicados um de cada vez
+  custo_investigacao: [0.5, 2.0]
+  atrito_legitimo: [0.5, 2.0]
+  eficacia_autenticacao: [0.5, 0.9]

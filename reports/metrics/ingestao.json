@@ -1,0 +1,31 @@
+{
+  "fonte": "kartik2112/fraud-detection",
+  "licenca": "CC0-1.0",
+  "ingestao_utc": "2026-11-26T07:00:16.617222+00:00",
+  "arquivos": {
+    "fraudTrain.csv": {
+      "sha256": "fd7139200dbfcbed0b6742bbe05a4f1abce532c4fef20918228a651647a3e75d",
+      "linhas": 1296675,
+      "fraudes": 7506,
+      "inicio": "2019-01-01 00:00:18",
+      "fim": "2020-06-21 12:13:37",
+      "nulos": 0,
+      "trans_num_duplicados": 0
+    },
+    "fraudTest.csv": {
+      "sha256": "12d553ab19440c752d2531ee1af44bb64f12cc3d3839f1649f19e81c230545f0",
+      "linhas": 555719,
+      "fraudes": 2145,
+      "inicio": "2020-06-21 12:14:25",
+      "fim": "2020-12-31 23:59:34",
+      "nulos": 0,
+      "trans_num_duplicados": 0
+    }
+  },
+  "trans_num_duplicados_total": 0,
+  "bronze": {
+    "tabela": "zuper-fraud-intelligence:fraud_intelligence.bronze_raw_transactions",
+    "linhas": 1852394,
+    "bytes": 687247343
+  }
+}

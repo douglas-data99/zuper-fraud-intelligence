@@ -1,0 +1,11 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+pydantic==2.11.4
+redis==5.2.1
+xgboost-cpu==2.1.4
+scikit-learn==1.6.1
+numpy==2.2.6
+pandas==2.2.3
+pyarrow==19.0.1
+joblib==1.5.1
+google-cloud-bigquery==3.46.2

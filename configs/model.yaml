@@ -1,0 +1,44 @@
+seed: 42
+features:
+  # Experimento A: só o que a transação atual traz
+  transacionais: [amount_usd, log_amount, hour, weekday, distance_to_merchant_km]
+  categoricas: [category]
+  # Experimento B: A + histórico do cartão (point-in-time)
+  comportamentais:
+    - avg_amount_7d
+    - avg_amount_30d
+    - std_amount_30d
+    - amount_vs_avg_30d
+    - tx_count_30min
+    - tx_count_24h
+    - tx_count_7d
+    - tx_count_30d
+    - sum_amount_24h
+    - time_since_last_tx_s
+    - is_new_merchant
+    - category_frequency_30d
+    - merchant_distinct_cards_30d
+    - profile_history_count
+categorias: [entertainment, food_dining, gas_transport, grocery_net, grocery_pos, health_fitness, home, kids_pets, misc_net, misc_pos, personal_care, shopping_net, shopping_pos, travel]
+xgboost:
+  base:            # ponto de partida antes do Optuna
+    max_depth: 6
+    learning_rate: 0.1
+    n_estimators: 5000      # teto alto; o early stopping (janela de tuning) para antes, conferido em best_iteration
+    min_child_weight: 5
+    subsample: 0.8
+    colsample_bytree: 0.8
+    reg_alpha: 0.0
+    reg_lambda: 1.0
+    early_stopping_rounds: 100
+  optuna:
+    trials: 25
+    timeout_s: 2700
+    startup_trials: 10       # primeiros trials aleatórios (TPE só aprende depois)
+random_forest:
+  n_estimators: 300
+  max_depth: 14
+  min_samples_leaf: 20
+  max_samples: 0.5
+calibracao: isotonic         # comparada com sigmoid na janela de calibração
+shap_amostra: 20000

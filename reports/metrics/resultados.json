@@ -1,0 +1,639 @@
+{
+  "gerado_em": "2026-11-26 04:49:47",
+  "congelado_antes_do_teste_em": "2026-11-26 04:47:37",
+  "dataset_sha256": "a89c9b3393126d3d1940bd5f469843257bdac8c8257ec476458e4e37fa5e9cc6",
+  "git": "4219851",
+  "splits": {
+    "train": {
+      "n": 872325,
+      "fraudes": 4714,
+      "inicio": "2019-02-01 00:02:24+00:00",
+      "fim": "2019-12-31 23:59:53+00:00"
+    },
+    "tuning": {
+      "n": 99993,
+      "fraudes": 679,
+      "inicio": "2020-01-01 00:00:57+00:00",
+      "fim": "2020-02-28 23:59:45+00:00"
+    },
+    "calibration": {
+      "n": 139742,
+      "fraudes": 746,
+      "inicio": "2020-03-01 00:02:20+00:00",
+      "fim": "2020-04-30 23:59:42+00:00"
+    },
+    "policy": {
+      "n": 132090,
+      "fraudes": 861,
+      "inicio": "2020-05-01 00:00:01+00:00",
+      "fim": "2020-06-21 12:13:37+00:00"
+    },
+    "test": {
+      "n": 555719,
+      "fraudes": 2145,
+      "inicio": "2020-06-21 12:14:25+00:00",
+      "fim": "2020-12-31 23:59:34+00:00"
+    }
+  },
+  "tuning": {
+    "Dummy (prior)": {
+      "AP": 0.006790475333273329,
+      "PR_AUC_trapezio": 0.5033952376666366,
+      "ROC_AUC": 0.5,
+      "recall_fpr_0.5pct": 0.005,
+      "recall_fpr_1pct": 0.01,
+      "prevalencia": 0.006790475333273329,
+      "n": 99993,
+      "positivos": 679
+    },
+    "Regressão Logística A": {
+      "AP": 0.23298712460013551,
+      "PR_AUC_trapezio": 0.2324856257566192,
+      "ROC_AUC": 0.9461381513115169,
+      "recall_fpr_0.5pct": 0.4050073637702504,
+      "recall_fpr_1pct": 0.6450662739322534,
+      "prevalencia": 0.006790475333273329,
+      "n": 99993,
+      "positivos": 679
+    },
+    "Regressão Logística B": {
+      "AP": 0.4347062399536358,
+      "PR_AUC_trapezio": 0.4365588497530299,
+      "ROC_AUC": 0.9896684332577447,
+      "recall_fpr_0.5pct": 0.7290132547864506,
+      "recall_fpr_1pct": 0.8350515463917526,
+      "prevalencia": 0.006790475333273329,
+      "n": 99993,
+      "positivos": 679
+    },
+    "Random Forest B": {
+      "AP": 0.9473317709331023,
+      "PR_AUC_trapezio": 0.9473039758824232,
+      "ROC_AUC": 0.998870039338789,
+      "recall_fpr_0.5pct": 0.9705449189985272,
+      "recall_fpr_1pct": 0.9823269513991163,
+      "prevalencia": 0.006790475333273329,
+      "n": 99993,
+      "positivos": 679
+    },
+    "XGBoost A (transacional)": {
+      "AP": 0.8515884838759799,
+      "PR_AUC_trapezio": 0.8515120136065992,
+      "ROC_AUC": 0.9968432044710365,
+      "recall_fpr_0.5pct": 0.8718703976435935,
+      "recall_fpr_1pct": 0.93519882179676,
+      "prevalencia": 0.006790475333273329,
+      "n": 99993,
+      "positivos": 679
+    },
+    "XGBoost B (comportamental)": {
+      "AP": 0.9820803312113365,
+      "PR_AUC_trapezio": 0.9820701104406437,
+      "ROC_AUC": 0.9998281584274901,
+      "recall_fpr_0.5pct": 0.9896907216494846,
+      "recall_fpr_1pct": 1.0,
+      "prevalencia": 0.006790475333273329,
+      "n": 99993,
+      "positivos": 679
+    },
+    "XGBoost B + Optuna": {
+      "AP": 0.9825263253011389,
+      "PR_AUC_trapezio": 0.9825179862687697,
+      "ROC_AUC": 0.9998191348171281,
+      "recall_fpr_0.5pct": 0.9911634756995582,
+      "recall_fpr_1pct": 0.9985272459499264,
+      "prevalencia": 0.006790475333273329,
+      "n": 99993,
+      "positivos": 679
+    }
+  },
+  "teste": {
+    "Dummy (prior)": {
+      "AP": 0.0038598644278853163,
+      "PR_AUC_trapezio": 0.5019299322139427,
+      "ROC_AUC": 0.5,
+      "recall_fpr_0.5pct": 0.005,
+      "recall_fpr_1pct": 0.01,
+      "prevalencia": 0.0038598644278853163,
+      "n": 555719,
+      "positivos": 2145,
+      "recall_valor_top1pct": 1.0
+    },
+    "Regressão Logística A": {
+      "AP": 0.1405307282525342,
+      "PR_AUC_trapezio": 0.1404234470752947,
+      "ROC_AUC": 0.9300326583880363,
+      "recall_fpr_0.5pct": 0.3822843822843823,
+      "recall_fpr_1pct": 0.6396270396270396,
+      "prevalencia": 0.0038598644278853163,
+      "n": 555719,
+      "positivos": 2145,
+      "recall_valor_top1pct": 0.8167972923699146
+    },
+    "Regressão Logística B": {
+      "AP": 0.28081396129673414,
+      "PR_AUC_trapezio": 0.28450960270669573,
+      "ROC_AUC": 0.9809604998409024,
+      "recall_fpr_0.5pct": 0.6671328671328671,
+      "recall_fpr_1pct": 0.8177156177156177,
+      "prevalencia": 0.0038598644278853163,
+      "n": 555719,
+      "positivos": 2145,
+      "recall_valor_top1pct": 0.9081083807334009
+    },
+    "Random Forest B": {
+      "AP": 0.8875031578638151,
+      "PR_AUC_trapezio": 0.8874869561057878,
+      "ROC_AUC": 0.997131198888868,
+      "recall_fpr_0.5pct": 0.9431235431235431,
+      "recall_fpr_1pct": 0.9594405594405594,
+      "prevalencia": 0.0038598644278853163,
+      "n": 555719,
+      "positivos": 2145,
+      "recall_valor_top1pct": 0.9909622809943569
+    },
+    "XGBoost A (transacional)": {
+      "AP": 0.7617724159707726,
+      "PR_AUC_trapezio": 0.7617339838264867,
+      "ROC_AUC": 0.9958419525729406,
+      "recall_fpr_0.5pct": 0.848018648018648,
+      "recall_fpr_1pct": 0.9184149184149184,
+      "prevalencia": 0.0038598644278853163,
+      "n": 555719,
+      "positivos": 2145,
+      "recall_valor_top1pct": 0.9620300071467603
+    },
+    "XGBoost B (comportamental)": {
+      "AP": 0.9557627419310292,
+      "PR_AUC_trapezio": 0.9557568582324658,
+      "ROC_AUC": 0.9989507238754856,
+      "recall_fpr_0.5pct": 0.9790209790209791,
+      "recall_fpr_1pct": 0.9864801864801864,
+      "prevalencia": 0.0038598644278853163,
+      "n": 555719,
+      "positivos": 2145,
+      "recall_valor_top1pct": 0.9957810148456309
+    },
+    "XGBoost B + Optuna": {
+      "AP": 0.9557988907918775,
+      "PR_AUC_trapezio": 0.9557926759688358,
+      "ROC_AUC": 0.9989390695796704,
+      "recall_fpr_0.5pct": 0.9794871794871794,
+      "recall_fpr_1pct": 0.9874125874125874,
+      "prevalencia": 0.0038598644278853163,
+      "n": 555719,
+      "positivos": 2145,
+      "recall_valor_top1pct": 0.994643653220364
+    }
+  },
+  "champion": "XGBoost B + Optuna",
+  "challenger": "Random Forest B",
+  "ablacao_A_vs_B_teste": {
+    "A": {
+      "AP": 0.7617724159707726,
+      "PR_AUC_trapezio": 0.7617339838264867,
+      "ROC_AUC": 0.9958419525729406,
+      "recall_fpr_0.5pct": 0.848018648018648,
+      "recall_fpr_1pct": 0.9184149184149184,
+      "prevalencia": 0.0038598644278853163,
+      "n": 555719,
+      "positivos": 2145,
+      "recall_valor_top1pct": 0.9620300071467603
+    },
+    "B": {
+      "AP": 0.9557988907918775,
+      "PR_AUC_trapezio": 0.9557926759688358,
+      "ROC_AUC": 0.9989390695796704,
+      "recall_fpr_0.5pct": 0.9794871794871794,
+      "recall_fpr_1pct": 0.9874125874125874,
+      "prevalencia": 0.0038598644278853163,
+      "n": 555719,
+      "positivos": 2145,
+      "recall_valor_top1pct": 0.994643653220364
+    }
+  },
+  "experimento_C_sem_valor": {
+    "C1_sem_valor": {
+      "features_removidas": [
+        "amount_usd",
+        "log_amount",
+        "amount_vs_avg_30d",
+        "sum_amount_24h"
+      ],
+      "tuning": {
+        "AP": 0.663224295457945,
+        "PR_AUC_trapezio": 0.663113366532912,
+        "ROC_AUC": 0.9734346171437089,
+        "recall_fpr_0.5pct": 0.6715758468335787,
+        "recall_fpr_1pct": 0.7378497790868925,
+        "prevalencia": 0.006790475333273329,
+        "n": 99993,
+        "positivos": 679
+      },
+      "teste": {
+        "AP": 0.563705283531249,
+        "PR_AUC_trapezio": 0.563661842511281,
+        "ROC_AUC": 0.9669946464349742,
+        "recall_fpr_0.5pct": 0.6344988344988345,
+        "recall_fpr_1pct": 0.6941724941724942,
+        "prevalencia": 0.0038598644278853163,
+        "n": 555719,
+        "positivos": 2145
+      }
+    },
+    "C2_sem_valor_e_rajada": {
+      "features_removidas": [
+        "amount_usd",
+        "log_amount",
+        "amount_vs_avg_30d",
+        "sum_amount_24h",
+        "avg_amount_7d",
+        "avg_amount_30d",
+        "std_amount_30d",
+        "tx_count_30min",
+        "tx_count_24h"
+      ],
+      "tuning": {
+        "AP": 0.33725073799275024,
+        "PR_AUC_trapezio": 0.3369915551167637,
+        "ROC_AUC": 0.9322815337960678,
+        "recall_fpr_0.5pct": 0.374079528718704,
+        "recall_fpr_1pct": 0.4418262150220913,
+        "prevalencia": 0.006790475333273329,
+        "n": 99993,
+        "positivos": 679
+      },
+      "teste": {
+        "AP": 0.21071555886077048,
+        "PR_AUC_trapezio": 0.210639975610827,
+        "ROC_AUC": 0.9180549928141036,
+        "recall_fpr_0.5pct": 0.2834498834498835,
+        "recall_fpr_1pct": 0.33986013986013985,
+        "prevalencia": 0.0038598644278853163,
+        "n": 555719,
+        "positivos": 2145
+      }
+    },
+    "C3_champion_abaixo_800": {
+      "teste": {
+        "AP": 0.9395082648793388,
+        "PR_AUC_trapezio": 0.939496607416412,
+        "ROC_AUC": 0.9985008619526922,
+        "recall_fpr_0.5pct": 0.9748520710059172,
+        "recall_fpr_1pct": 0.9837278106508875,
+        "prevalencia": 0.002444726930149884,
+        "n": 553027,
+        "positivos": 1352
+      },
+      "transacoes": 553027,
+      "fraudes": 1352
+    }
+  },
+  "calibracao": {
+    "escolhida": "sigmoid",
+    "brier_janela_policy": {
+      "bruto": 0.0008673839675050437,
+      "isotonic": 0.0006513921694094962,
+      "sigmoid": 0.0006402699513040206
+    },
+    "brier_teste": {
+      "bruto": 0.0008072711793899104,
+      "calibrado": 0.0005773587562461625
+    }
+  },
+  "politica": {
+    "t_auth": 0.010053978819117609,
+    "t_review": 0.18658957974956103,
+    "versao": "policy-v1",
+    "otimizacao_janela_policy": {
+      "t_auth": 0.010053978819117609,
+      "t_review": 0.18658957974956103,
+      "custo_3_niveis": 37917.947999994394,
+      "custo_aprovar_tudo": 467456.1900000002,
+      "custo_1_corte": 51466.24199999906,
+      "t_1_corte": 0.18658957974956103,
+      "pct_autenticar": 0.0033462033462033462,
+      "pct_investigar": 0.0066924066924066924,
+      "n": 132090
+    },
+    "sensibilidade": {
+      "custo_investigacao=0.5": {
+        "t_auth": 0.010053978819117609,
+        "t_review": 0.18658957974956103,
+        "custo_3_niveis": 34381.94799999672,
+        "pct_autenticar": 0.0033462033462033462,
+        "pct_investigar": 0.0066924066924066924
+      },
+      "custo_investigacao=2.0": {
+        "t_auth": 0.010053978819117609,
+        "t_review": 0.18658957974956103,
+        "custo_3_niveis": 44989.947999994394,
+        "pct_autenticar": 0.0033462033462033462,
+        "pct_investigar": 0.0066924066924066924
+      },
+      "atrito_legitimo=0.5": {
+        "t_auth": 0.010053978819117609,
+        "t_review": 0.18658957974956103,
+        "custo_3_niveis": 37341.94800000257,
+        "pct_autenticar": 0.0033462033462033462,
+        "pct_investigar": 0.0066924066924066924
+      },
+      "atrito_legitimo=2.0": {
+        "t_auth": 0.010053978819117609,
+        "t_review": 0.18658957974956103,
+        "custo_3_niveis": 39069.94799999428,
+        "pct_autenticar": 0.0033462033462033462,
+        "pct_investigar": 0.0066924066924066924
+      },
+      "eficacia_autenticacao=0.5": {
+        "t_auth": 0.010053978819117609,
+        "t_review": 0.18658957974956103,
+        "custo_3_niveis": 41941.63199999437,
+        "pct_autenticar": 0.0033462033462033462,
+        "pct_investigar": 0.0066924066924066924
+      },
+      "eficacia_autenticacao=0.9": {
+        "t_auth": 0.010053978819117609,
+        "t_review": 0.18658957974956103,
+        "custo_3_niveis": 33894.263999994444,
+        "pct_autenticar": 0.0033462033462033462,
+        "pct_investigar": 0.0066924066924066924
+      }
+    }
+  },
+  "politica_teste": {
+    "n": 555719,
+    "fraudes": 2145,
+    "valor_fraudado": 1133324.6800000002,
+    "aprovar": {
+      "transacoes": 551798,
+      "pct": 0.9929442757940614,
+      "fraudes": 62,
+      "legitimas": 551736,
+      "valor_fraude": 11351.019999999999
+    },
+    "autenticar": {
+      "transacoes": 1687,
+      "pct": 0.0030357068950314816,
+      "fraudes": 136,
+      "legitimas": 1551,
+      "valor_fraude": 53109.21000000001
+    },
+    "investigar": {
+      "transacoes": 2234,
+      "pct": 0.0040200173109071315,
+      "fraudes": 1947,
+      "legitimas": 287,
+      "valor_fraude": 1068864.4500000002
+    },
+    "valor_fraude_sinalizado": 1121973.6600000001,
+    "valor_potencialmente_evitado": 1052597.6745,
+    "recall_valor_sinalizado": 0.9899843176449665,
+    "custo_total": 103526.10550000005,
+    "custo_aprovar_tudo": 1133324.6799999997,
+    "beneficio_liquido_vs_aprovar_tudo": 1029798.5744999996,
+    "custo_operacional": 18378.1,
+    "custo_atrito": 4421.0,
+    "perda_residual": 80727.00550000006
+  },
+  "politica_1_corte_teste": {
+    "n": 555719,
+    "fraudes": 2145,
+    "valor_fraudado": 1133324.6800000002,
+    "aprovar": {
+      "transacoes": 553485,
+      "pct": 0.9959799826890928,
+      "fraudes": 198,
+      "legitimas": 553287,
+      "valor_fraude": 64460.23
+    },
+    "autenticar": {
+      "transacoes": 0,
+      "pct": 0.0,
+      "fraudes": 0,
+      "legitimas": 0,
+      "valor_fraude": 0.0
+    },
+    "investigar": {
+      "transacoes": 2234,
+      "pct": 0.0040200173109071315,
+      "fraudes": 1947,
+      "legitimas": 287,
+      "valor_fraude": 1068864.4500000002
+    },
+    "valor_fraude_sinalizado": 1068864.4500000002,
+    "valor_potencialmente_evitado": 1015421.2275,
+    "recall_valor_sinalizado": 0.9431228921971416,
+    "custo_total": 138645.45250000004,
+    "custo_aprovar_tudo": 1133324.6799999997,
+    "beneficio_liquido_vs_aprovar_tudo": 994679.2274999997,
+    "custo_operacional": 17872.0,
+    "custo_atrito": 2870.0,
+    "perda_residual": 117903.45250000004
+  },
+  "metricas_no_corte_review": {
+    "corte": 0.18658957974956103,
+    "precision": 0.8715308863025962,
+    "recall": 0.9076923076923077,
+    "f1": 0.8892441196620233,
+    "accuracy": 0.9991272567610608,
+    "fpr": 0.0005184492046230494,
+    "taxa_alerta": 0.0040200173109071315,
+    "tp": 1947,
+    "fp": 287,
+    "fn": 198,
+    "tn": 553287
+  },
+  "metricas_no_corte_auth": {
+    "corte": 0.010053978819117609,
+    "precision": 0.5312420300943637,
+    "recall": 0.9710955710955711,
+    "f1": 0.6867787668974613,
+    "accuracy": 0.9965810058680736,
+    "fpr": 0.0033202426414535363,
+    "taxa_alerta": 0.007055724205938613,
+    "tp": 2083,
+    "fp": 1838,
+    "fn": 62,
+    "tn": 551736
+  },
+  "segmentos_teste": {
+    "categoria": {
+      "entertainment": {
+        "n": 40104,
+        "fraudes": 59,
+        "AP": 0.9826177053171903,
+        "recall_sinalizado": 1.0,
+        "taxa_alerta": 0.0035158587672052665
+      },
+      "food_dining": {
+        "n": 39268,
+        "fraudes": 54,
+        "AP": 0.5962256007964554,
+        "recall_sinalizado": 0.7407407407407407,
+        "taxa_alerta": 0.004456554955689111
+      },
+      "gas_transport": {
+        "n": 56370,
+        "fraudes": 154,
+        "AP": 0.9960430209145102,
+        "recall_sinalizado": 1.0,
+        "taxa_alerta": 0.003335107326592159
+      },
+      "grocery_net": {
+        "n": 19426,
+        "fraudes": 41,
+        "AP": 0.8765720717868928,
+        "recall_sinalizado": 0.975609756097561,
+        "taxa_alerta": 0.007824565015957994
+      },
+      "grocery_pos": {
+        "n": 52553,
+        "fraudes": 485,
+        "AP": 0.9988097133929748,
+        "recall_sinalizado": 1.0,
+        "taxa_alerta": 0.01019922744657774
+      },
+      "health_fitness": {
+        "n": 36674,
+        "fraudes": 52,
+        "AP": 0.9033629480789335,
+        "recall_sinalizado": 0.9423076923076923,
+        "taxa_alerta": 0.003844685608332879
+      },
+      "home": {
+        "n": 52345,
+        "fraudes": 67,
+        "AP": 0.9043405429074882,
+        "recall_sinalizado": 0.9552238805970149,
+        "taxa_alerta": 0.002693667016907059
+      },
+      "kids_pets": {
+        "n": 48692,
+        "fraudes": 65,
+        "AP": 0.8131981005377283,
+        "recall_sinalizado": 0.8615384615384616,
+        "taxa_alerta": 0.003758317588104822
+      },
+      "misc_net": {
+        "n": 27367,
+        "fraudes": 267,
+        "AP": 0.972063719864513,
+        "recall_sinalizado": 0.9887640449438202,
+        "taxa_alerta": 0.01629700003654036
+      },
+      "misc_pos": {
+        "n": 34574,
+        "fraudes": 72,
+        "AP": 0.8427831623505398,
+        "recall_sinalizado": 0.9166666666666666,
+        "taxa_alerta": 0.006565627350031816
+      },
+      "personal_care": {
+        "n": 39327,
+        "fraudes": 70,
+        "AP": 0.7578281533954005,
+        "recall_sinalizado": 0.8571428571428571,
+        "taxa_alerta": 0.004831286393571847
+      },
+      "shopping_net": {
+        "n": 41779,
+        "fraudes": 506,
+        "AP": 0.9853246873084327,
+        "recall_sinalizado": 0.9940711462450593,
+        "taxa_alerta": 0.019890375547523875
+      },
+      "shopping_pos": {
+        "n": 49791,
+        "fraudes": 213,
+        "AP": 0.9450033839625693,
+        "recall_sinalizado": 0.9859154929577465,
+        "taxa_alerta": 0.008997610009841136
+      },
+      "travel": {
+        "n": 17449,
+        "fraudes": 40,
+        "AP": 0.7136745197798007,
+        "recall_sinalizado": 0.825,
+        "taxa_alerta": 0.006991804687947733
+      }
+    },
+    "faixa_valor": {
+      "<50": {
+        "n": 288930,
+        "fraudes": 462,
+        "AP": 0.8935603950659925,
+        "recall_sinalizado": 0.9329004329004329,
+        "taxa_alerta": 0.0037933063371750945
+      },
+      "50-200": {
+        "n": 241440,
+        "fraudes": 72,
+        "AP": 0.6263265092705713,
+        "recall_sinalizado": 0.7222222222222222,
+        "taxa_alerta": 0.0008159377070907886
+      },
+      "200-500": {
+        "n": 19271,
+        "fraudes": 575,
+        "AP": 0.9926507113559638,
+        "recall_sinalizado": 0.9965217391304347,
+        "taxa_alerta": 0.043381246432463286
+      },
+      "500-1000": {
+        "n": 4495,
+        "fraudes": 760,
+        "AP": 0.9759403412787218,
+        "recall_sinalizado": 0.9921052631578947,
+        "taxa_alerta": 0.2809788654060067
+      },
+      ">1000": {
+        "n": 1583,
+        "fraudes": 276,
+        "AP": 0.9700991379348675,
+        "recall_sinalizado": 0.9891304347826086,
+        "taxa_alerta": 0.33417561591914086
+      }
+    },
+    "historico": {
+      "frio (<20 tx)": {
+        "n": 163,
+        "fraudes": 163,
+        "AP": null,
+        "recall_sinalizado": 0.9938650306748467,
+        "taxa_alerta": 0.9938650306748467
+      },
+      "maduro": {
+        "n": 555556,
+        "fraudes": 1982,
+        "AP": 0.9502239258017128,
+        "recall_sinalizado": 0.9692230070635721,
+        "taxa_alerta": 0.00676619458704433
+      }
+    }
+  },
+  "shap_top": {
+    "amount_usd": 2.8889100551605225,
+    "sum_amount_24h": 1.8396799564361572,
+    "hour": 1.5168499946594238,
+    "log_amount": 1.4151500463485718,
+    "avg_amount_7d": 0.8864700198173523,
+    "time_since_last_tx_s": 0.847100019454956,
+    "amount_vs_avg_30d": 0.7347599864006042,
+    "tx_count_24h": 0.7287700176239014,
+    "tx_count_30d": 0.4567199945449829,
+    "avg_amount_30d": 0.3969700038433075,
+    "std_amount_30d": 0.3934899866580963,
+    "cat_gas_transport": 0.3708299994468689,
+    "profile_history_count": 0.3553999960422516,
+    "category_frequency_30d": 0.33654001355171204,
+    "tx_count_7d": 0.30737000703811646,
+    "merchant_distinct_cards_30d": 0.28148001432418823,
+    "cat_shopping_pos": 0.27911001443862915,
+    "distance_to_merchant_km": 0.2685700058937073,
+    "cat_shopping_net": 0.21831999719142914,
+    "weekday": 0.17282000184059143
+  },
+  "shadow_corr_ranking": 0.5708100899019798,
+  "duracao_s": 1795.0
+}

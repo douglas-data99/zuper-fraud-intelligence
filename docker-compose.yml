@@ -1,0 +1,91 @@
+# Zuper Fraud Intelligence: projeto Compose ISOLADO (rede, volumes e nomes próprios).
+# Nenhuma porta pública: a API só escuta em 127.0.0.1 e é publicada pelo proxy existente (Caddy);
+# Redis e MLflow ficam privados (MLflow só por túnel SSH).
+name: zuper-fraud
+services:
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "180mb", "--maxmemory-policy", "noeviction", "--save", "300 10"]
+    volumes: [redis_data:/data]
+    mem_limit: 220m
+    cpus: 0.3
+    restart: unless-stopped
+    healthcheck: {test: ["CMD", "redis-cli", "ping"], interval: 15s, timeout: 3s, retries: 5}
+    networks: [interna]
+
+  api:
+    build: ./backend
+    image: zuper-fraud-api:1.0
+    env_file: .env.vps
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      BUNDLE_DIR: /app/bundle
+      MODEL_THREADS: "1"
+    volumes:
+      - ./artifacts/model_bundle:/app/bundle:ro
+      - ./data/serving:/app/serving:ro
+    ports: ["127.0.0.1:8095:8000"]
+    depends_on: {redis: {condition: service_healthy}}
+    mem_limit: 450m
+    cpus: 0.8
+    restart: unless-stopped
+    networks:
+      interna: {}
+      proxy: {aliases: [zfi-api]}   # rede do Caddy existente: só a API entra nela
+
+  worker:
+    image: zuper-fraud-api:1.0
+    command: ["python", "-m", "app.worker"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,time,redis;r=redis.Redis.from_url(os.environ['REDIS_URL']);assert time.time()-float(r.get('fraud:worker:heartbeat') or 0)<60"]
+      interval: 30s
+    env_file: .env.vps
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/gcp.json
+    volumes:
+      - ./secrets/gcp-fraud-pipeline.json:/run/secrets/gcp.json:ro
+    depends_on: {redis: {condition: service_healthy}, api: {condition: service_started}}
+    mem_limit: 300m
+    cpus: 0.3
+    restart: unless-stopped
+    networks: [interna]
+
+  replay:
+    image: zuper-fraud-api:1.0
+    command: ["python", "-m", "app.replay"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,redis;redis.Redis.from_url(os.environ['REDIS_URL']).ping()"]
+      interval: 30s
+    env_file: .env.vps
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      BUNDLE_DIR: /app/bundle
+      SERVING_DIR: /app/serving
+    volumes:
+      - ./artifacts/model_bundle:/app/bundle:ro
+      - ./data/serving:/app/serving:ro
+    depends_on: {redis: {condition: service_healthy}}
+    mem_limit: 450m
+    cpus: 0.4
+    restart: unless-stopped
+    networks: [interna]
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.22.1
+    command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000",
+              "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--artifacts-destination", "/mlflow/artifacts", "--serve-artifacts"]
+    volumes: [./artifacts/mlflow:/mlflow]
+    ports: ["127.0.0.1:5005:5000"]      # só via túnel SSH: ssh -L 5005:127.0.0.1:5005 root@VPS
+    mem_limit: 400m
+    cpus: 0.3
+    restart: unless-stopped
+    networks: [interna]
+
+volumes:
+  redis_data:
+networks:
+  interna:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:-evolution_default}
