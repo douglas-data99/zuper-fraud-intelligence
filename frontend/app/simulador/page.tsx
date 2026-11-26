@@ -193,7 +193,7 @@ export default function Simulador() {
         <div className="grade" style={{ gap: 16 }}>
           <div className="card">
             <div className="card-cab"><div><h2>Perfil comportamental</h2><p>Features reais do cliente, lidas da feature store online.</p></div><span className="selo sem-ponto">Redis</span></div>
-            {!perfil ? <div className="esqueleto" style={{ height: 150 }} aria-label="carregando perfil" /> : (
+            {!perfil ? (erro ? <div className="estado">Perfil indisponível: a API não respondeu.</div> : <div className="esqueleto" style={{ height: 150 }} aria-label="carregando perfil" />) : (
               <>
                 <div className="comparacao-atual">
                   <div className="item"><div className="r">Compra atual</div><b>{fmt.usd(Number(form.amount_usd), 2)}</b></div>
