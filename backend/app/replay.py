@@ -18,7 +18,7 @@ import pandas as pd
 
 from .features import calcular_online
 from .main_deps import modelo_padrao
-from .store import TTL_EVENTO, Store
+from .store import TTL_REPLAY, Store
 
 MATURACAO_S = 30 * 86400
 
@@ -55,6 +55,8 @@ def main():
             time.sleep(2)
             continue
         eps, deriva = float(cmd.get("eps", 20)), float(cmd.get("deriva_valor", 1.0))
+        if cursor % 50 == 0:
+            st.r.set("fraud:replay:status", json.dumps({"status": "rodando", "cursor": cursor, "total": len(df)}))
         r = df.iloc[cursor]
         t0 = time.perf_counter()
         perfil, _ = st.perfil(r.card_key)
@@ -73,9 +75,9 @@ def main():
               "challenger_decision": res["shadow"]["decisao_hipotetica"] if res.get("shadow") else None,
               "policy_version": modelo.politica.versao, "t_auth": modelo.politica.t_auth, "t_review": modelo.politica.t_review,
               "model_version": modelo.versao, "reasons": res["reasons"]["itens"], "recebido_em": time.time(), "latency_ms": round(ms, 3)}
-        if st.reservar_tx(r.tx_id):
+        if st.reservar_tx(r.tx_id, TTL_REPLAY):
             st.publicar(ev)
-            st.r.set(f"fraud:status:{r.tx_id}", "publicado", ex=TTL_EVENTO)
+            st.r.set(f"fraud:status:{r.tx_id}", "publicado", ex=TTL_REPLAY)
             st.registrar_latencia(ms, res["decision"], "replay")
             # rótulo guardado com liberação em D+30 virtual (o modelo não usa)
             st.r.zadd("fraud:labels:pendentes", {json.dumps({"tx_id": r.tx_id, "label": int(r.is_fraud), "valor": float(r.amount_usd),

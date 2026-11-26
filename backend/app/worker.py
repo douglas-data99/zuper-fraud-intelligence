@@ -2,8 +2,9 @@
 
 Garantias (e limites) documentados:
 - Consumer group + ACK SÓ depois da persistência: se o worker cair, a mensagem fica pendente e é retomada (XAUTOCLAIM).
-- Idempotência: SADD fraud:persisted:{tx_id}; evento repetido não atualiza o perfil duas vezes.
+- Idempotência: marcador fraud:applied:{tx_id} gravado no MESMO MULTI do perfil; reentrega não soma de novo.
 - Atualização do perfil com WATCH/MULTI (otimista): sem sobrescrever escrita concorrente.
+- Mensagem envenenada (JSON inválido, campo faltando) vai para a DLQ; erro transitório de Redis NÃO: fica pendente e é retomado.
 - Semântica de histórico: transações aprovadas e autenticadas entram nas features de velocidade;
   as retidas para investigação NÃO entram (não foram autorizadas) e são contadas à parte em fraud:tentativas_retidas.
 - BigQuery: lotes via load job (sem custo de streaming insert). Sem credencial, roda em modo degradado ROTULADO
@@ -127,6 +128,8 @@ class Worker:
                     store.r.xack(STREAM, GRUPO, msg_id)   # já persistido antes: reentrega
                     continue
                 e["perfil"] = aplicar_no_perfil(store, e)
+            except (redis.ConnectionError, redis.TimeoutError, RuntimeError):
+                raise   # transitório (ou conflito de concorrência): sem ACK, a mensagem é retomada depois
             except Exception as exc:
                 # mensagem envenenada: vai para a fila de análise e sai do fluxo (sem loop infinito)
                 store.r.xadd(DLQ, {"msg_id": msg_id, "erro": str(exc)[:300], "dados": str(campos.get("dados", ""))[:4000]}, maxlen=5000, approximate=True)
@@ -172,8 +175,8 @@ def main():
     while True:
         try:
             w.ciclo()
-        except (redis.ConnectionError, redis.TimeoutError) as exc:
-            print("Redis indisponível", exc, flush=True)
+        except (redis.ConnectionError, redis.TimeoutError, RuntimeError) as exc:
+            print("falha transitória, tentando de novo:", exc, flush=True)
             time.sleep(3)
 
 

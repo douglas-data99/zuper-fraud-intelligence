@@ -1,11 +1,12 @@
 # Zuper Fraud Intelligence: projeto Compose ISOLADO (rede, volumes e nomes próprios).
+# Redis: só chaves com TTL (por transação) podem ser despejadas; perfis, lojas e stream não têm TTL e ficam.
 # Nenhuma porta pública: a API só escuta em 127.0.0.1 e é publicada pelo proxy existente (Caddy);
 # Redis e MLflow ficam privados (MLflow só por túnel SSH).
 name: zuper-fraud
 services:
   redis:
     image: redis:7.4-alpine
-    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "180mb", "--maxmemory-policy", "noeviction", "--save", "300 10"]
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "180mb", "--maxmemory-policy", "volatile-ttl", "--save", "300 10"]
     volumes: [redis_data:/data]
     mem_limit: 220m
     cpus: 0.3

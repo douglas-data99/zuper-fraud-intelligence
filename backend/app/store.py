@@ -12,6 +12,7 @@ STREAM = "fraud:transactions"
 DLQ = "fraud:transactions:dlq"   # mensagens que falharam (poison), para análise
 TTL_EVENTO = 2 * 86400           # chaves por transação expiram em 2 dias (memória do Redis é limitada)
 STREAM_MAX = 20000
+TTL_REPLAY = 6 * 3600           # eventos do replay: chaves de status expiram antes
 GRUPO = "persistencia"
 
 
@@ -52,9 +53,9 @@ class Store:
         bruto = self.r.get(f"fraud:tx:{tx_id}")
         return json.loads(bruto) if bruto else None
 
-    def reservar_tx(self, tx_id: str) -> bool:
+    def reservar_tx(self, tx_id: str, ttl: int = TTL_EVENTO) -> bool:
         """True se este tx_id ainda não foi processado (SET NX). Evita efeito duplicado em retry."""
-        return bool(self.r.set(f"fraud:txlock:{tx_id}", "1", nx=True, ex=TTL_EVENTO))
+        return bool(self.r.set(f"fraud:txlock:{tx_id}", "1", nx=True, ex=ttl))
 
     def liberar_tx(self, tx_id: str):
         self.r.delete(f"fraud:txlock:{tx_id}")

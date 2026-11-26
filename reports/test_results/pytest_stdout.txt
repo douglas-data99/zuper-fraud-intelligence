@@ -53,5 +53,5 @@ tests/integration/test_api_stream.py::test_health
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 - generated xml file: C:\Users\Douglas\Documents\SITES\projetos-dados\zuper-fraud-intelligence\reports\test_results\junit.xml -
-================== 41 passed, 1 warning in 73.20s (0:01:13) ===================
+================== 41 passed, 1 warning in 90.78s (0:01:30) ===================
 
