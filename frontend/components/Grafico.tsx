@@ -8,17 +8,17 @@ const Plot = dynamic(async () => {
   return factory(Plotly);
 }, { ssr: false, loading: () => <div className="esqueleto" style={{ height: 240 }} aria-label="carregando gráfico" /> });
 
-export const COR = { protecao: "#34D399", intel: "#60A5FA", risco: "#F87171", atencao: "#FBBF24", neutro: "#64748B", texto: "#F1F5F9", sub: "#AEB9C9", linha: "#1E2A3D", roxo: "#A78BFA" };
+export const COR = { protecao: "#3DDC97", intel: "#7FA7D9", risco: "#F0716A", atencao: "#E8B04A", zuper: "#19B36B", neutro: "#5B6B80", texto: "#E8EEF5", sub: "#A3B0C0", linha: "#1F2A38", roxo: "#A99BE0" };
 
 const BASE: Partial<Plotly.Layout> = {
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
-  font: { color: "#AEB9C9", family: "Geist, Inter, system-ui, sans-serif", size: 12 },
+  font: { color: "#A3B0C0", family: "Geist, Inter, system-ui, sans-serif", size: 12 },
   margin: { l: 56, r: 16, t: 24, b: 46 },
-  xaxis: { gridcolor: "#1A2537", zerolinecolor: "#243247", linecolor: "#243247" },
-  yaxis: { gridcolor: "#1A2537", zerolinecolor: "#243247", linecolor: "#243247" },
+  xaxis: { gridcolor: "#172130", zerolinecolor: "#1F2A38", linecolor: "#1F2A38" },
+  yaxis: { gridcolor: "#172130", zerolinecolor: "#1F2A38", linecolor: "#1F2A38" },
   legend: { orientation: "h", y: -0.2, font: { size: 11 } },
-  hoverlabel: { bgcolor: "#182335", bordercolor: "#243247", font: { color: "#F1F5F9", family: "Geist, system-ui, sans-serif" } },
+  hoverlabel: { bgcolor: "#1C2838", bordercolor: "#2C3A4D", font: { color: "#E8EEF5", family: "Geist, system-ui, sans-serif" } },
   separators: ",.",
 };
 

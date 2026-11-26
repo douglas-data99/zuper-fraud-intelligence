@@ -1,0 +1,111 @@
+{
+  "gerado_em": "2026-11-26T16:36:59.235Z",
+  "erros_console": [],
+  "verificacoes": [
+    {
+      "nome": "sem rolagem lateral / @1440",
+      "ok": true,
+      "det": "scrollWidth=1440"
+    },
+    {
+      "nome": "sem rolagem lateral /operacoes @1440",
+      "ok": true,
+      "det": "scrollWidth=1440"
+    },
+    {
+      "nome": "sem rolagem lateral /simulador @1440",
+      "ok": true,
+      "det": "scrollWidth=1440"
+    },
+    {
+      "nome": "sem rolagem lateral /decisao @1440",
+      "ok": true,
+      "det": "scrollWidth=1440"
+    },
+    {
+      "nome": "sem rolagem lateral /lab @1440",
+      "ok": true,
+      "det": "scrollWidth=1440"
+    },
+    {
+      "nome": "sem rolagem lateral /monitoramento @1440",
+      "ok": true,
+      "det": "scrollWidth=1440"
+    },
+    {
+      "nome": "sem rolagem lateral /mlops @1440",
+      "ok": true,
+      "det": "scrollWidth=1440"
+    },
+    {
+      "nome": "sem rolagem lateral / @1920",
+      "ok": true,
+      "det": "scrollWidth=1920"
+    },
+    {
+      "nome": "sem rolagem lateral /operacoes @1920",
+      "ok": true,
+      "det": "scrollWidth=1920"
+    },
+    {
+      "nome": "sem rolagem lateral /simulador @1920",
+      "ok": true,
+      "det": "scrollWidth=1920"
+    },
+    {
+      "nome": "sem rolagem lateral /decisao @1920",
+      "ok": true,
+      "det": "scrollWidth=1920"
+    },
+    {
+      "nome": "sem rolagem lateral /lab @1920",
+      "ok": true,
+      "det": "scrollWidth=1920"
+    },
+    {
+      "nome": "sem rolagem lateral /monitoramento @1920",
+      "ok": true,
+      "det": "scrollWidth=1920"
+    },
+    {
+      "nome": "sem rolagem lateral /mlops @1920",
+      "ok": true,
+      "det": "scrollWidth=1920"
+    },
+    {
+      "nome": "sem rolagem lateral / @390",
+      "ok": true,
+      "det": "scrollWidth=390"
+    },
+    {
+      "nome": "sem rolagem lateral /operacoes @390",
+      "ok": true,
+      "det": "scrollWidth=390"
+    },
+    {
+      "nome": "sem rolagem lateral /simulador @390",
+      "ok": true,
+      "det": "scrollWidth=390"
+    },
+    {
+      "nome": "sem rolagem lateral /decisao @390",
+      "ok": true,
+      "det": "scrollWidth=390"
+    },
+    {
+      "nome": "sem rolagem lateral /lab @390",
+      "ok": true,
+      "det": "scrollWidth=390"
+    },
+    {
+      "nome": "sem rolagem lateral /monitoramento @390",
+      "ok": true,
+      "det": "scrollWidth=390"
+    },
+    {
+      "nome": "sem rolagem lateral /mlops @390",
+      "ok": true,
+      "det": "scrollWidth=390"
+    }
+  ]
+}

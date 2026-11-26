@@ -166,3 +166,14 @@ Registro contínuo de etapas, decisões, dúvidas e dificuldades. Ele serve de b
 - Tudo no ar e testado (41/41). Revisões E1 a E5 aprovadas.
 - **Pendências do Douglas:** listadas no `STATUS.md` (DNS, chave órfã, commit no SITES, noindex, recarregar cenários antes da entrevista).
 - **Relatório para o ChatGPT:** `docs/RELATORIO-PARA-REVISAO.md`.
+
+
+### Redesign v2 (26/11/2026, tarde): branch `redesign-v2`
+- **Direção visual:** "sala de controle de risco". Composição editorial, com títulos à esquerda, conteúdo à direita e régua fina entre as seções. Caixa só para objeto isolado. Uma paleta em que a cor carrega significado.
+- **Nova tela inicial "Como funciona":** a arquitetura em três faixas, inspirada no protótipo do Douglas. As ligações correm por canais livres entre colunas e linhas, sem cruzar texto. As logos ficam locais.
+- **Execução:** o design system e a tela inicial foram feitos primeiro. Depois, **4 agentes em paralelo**, um por grupo de páginas, cada página com seu CSS module.
+- **Revisão crítica no navegador:** 3 correções de layout:
+  - nomes cortados na topologia de MLOps;
+  - números e legenda desalinhados no Motor de decisão;
+  - indicadores do Monitoramento desalinhados.
+- **Bug real achado pelo teste automatizado:** o relógio da apresentação calculava o intervalo depois de atualizar a referência, e cada etapa durava cerca de 6 s em vez de 3. Corrigido e reverificado. Verificação final: 50/50 checagens e 41/41 testes.

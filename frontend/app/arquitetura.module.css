@@ -1,0 +1,114 @@
+/* Tela inicial: arquitetura interativa */
+.pagina { display: flex; flex-direction: column; min-height: calc(100vh - 136px); }
+
+.topo { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px 40px; flex-wrap: wrap; }
+.titulo { font-size: clamp(2rem, 1.4rem + 2vw, 3rem); letter-spacing: -.04em; font-weight: 600; margin: 0; line-height: 1.02; }
+.lead { font-size: var(--t-md); color: var(--ink-2); margin: 12px 0 0; max-width: 56ch; }
+.atalhos { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.controles { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; margin-top: 24px; }
+.passos { display: inline-flex; align-items: center; gap: 2px; }
+.passos button { padding: 6px 10px; font-size: 1.1rem; line-height: 1; }
+.contador { font-variant-numeric: tabular-nums; font-size: var(--t-sm); color: var(--ink-2); min-width: 56px; text-align: center; }
+.cenario { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: var(--t-sm); color: var(--ink-3); }
+
+.trilho { display: grid; grid-template-columns: repeat(18, 1fr); gap: 3px; margin: 16px 0 0; }
+.marco { height: 4px; padding: 0; border: 0; border-radius: 2px; background: var(--line); cursor: pointer; transition: background var(--medio) var(--ease); }
+.marco:hover { background: var(--line-forte); }
+.marco.marcoFeito.faixa1 { background: var(--zuper); }
+.marco.marcoFeito.faixa2 { background: var(--intel); }
+.marco.marcoFeito.faixa3 { background: var(--atencao); }
+.marco:focus-visible { outline-offset: 3px; }
+
+.area { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; margin-top: 22px; align-items: start; }
+
+/* palco: três faixas em grade, linhas alinhadas para as ligações correrem nos vãos */
+.palco { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: auto; column-gap: 64px; row-gap: 14px; }
+.ligacoes { position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 0; }
+.traco { fill: none; stroke: #1B2533; stroke-width: 1.25; transition: stroke var(--medio) var(--ease); }
+.traco.cruzado { stroke-dasharray: 2 4; }
+.traco.feito { stroke: #2C3A4D; }
+.traco.vivo { stroke: var(--zuper-forte); stroke-width: 1.75; stroke-dasharray: 6 6; animation: fluxo .7s linear infinite; }
+@keyframes fluxo { to { stroke-dashoffset: -12; } }
+
+.faixa { display: flex; gap: 10px; align-items: baseline; padding-bottom: 10px; margin-bottom: 4px; border-bottom: 1px solid var(--line); grid-row: 1; transition: border-color var(--medio) var(--ease); }
+.faixa b { display: block; font-size: var(--t-sm); font-weight: 600; color: var(--ink); }
+.faixa small { font-size: var(--t-xs); color: var(--ink-3); }
+.faixaNum { font-variant-numeric: tabular-nums; font-size: var(--t-xs); color: var(--ink-3); border: 1px solid var(--line-forte); border-radius: 50%; width: 20px; height: 20px; display: inline-grid; place-items: center; flex: none; transform: translateY(-1px); }
+.faixaAtiva { border-bottom-color: var(--zuper); }
+.faixaAtiva .faixaNum { border-color: var(--zuper); color: var(--zuper-forte); }
+
+.no { position: relative; z-index: 1; display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: center; gap: 12px; text-align: left; justify-content: stretch;
+  padding: 8px 12px; min-height: 50px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-2); color: var(--ink-3);
+  transition: border-color var(--medio) var(--ease), background var(--medio) var(--ease), color var(--medio) var(--ease); }
+.no:hover:not(:disabled) { background: var(--surface); border-color: var(--line-forte); }
+.icone { width: 36px; height: 36px; display: grid; place-items: center; filter: grayscale(1); opacity: .38; transition: filter var(--medio) var(--ease), opacity var(--medio) var(--ease); }
+.icone img { width: 28px; height: 28px; object-fit: contain; }
+.rotulo { min-width: 0; }
+.rotulo b { display: block; font-size: .8125rem; font-weight: 600; color: var(--ink-2); line-height: 1.25; transition: color var(--medio) var(--ease); }
+.rotulo small { display: block; font-size: var(--t-xs); color: var(--ink-3); line-height: 1.3; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.visto .icone { filter: none; opacity: 1; }
+.visto .rotulo b { color: var(--ink); }
+.visto .icone svg { color: var(--ink-2); }
+.ativo, .ativo:hover:not(:disabled) { border-color: var(--zuper); background: #0F1D18; }
+.ativo .icone svg { color: var(--zuper-forte); }
+.focado .icone { filter: none; opacity: 1; }
+.focado .rotulo b { color: var(--ink); }
+
+.acoes { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; align-self: center; }
+.acoes span { font-size: var(--t-xs); font-weight: 600; text-align: center; padding: 7px 4px; border-radius: var(--r-1); border: 1px solid var(--line); color: var(--ink-3); background: var(--bg); transition: all var(--medio) var(--ease); }
+.acoesOn .aprovar { color: var(--protecao); }
+.acoesOn .autenticar { color: var(--atencao); }
+.acoesOn .investigar { color: var(--risco); }
+.acoes .escolhida.aprovar { background: var(--protecao-bg); border-color: var(--protecao); }
+.acoes .escolhida.autenticar { background: var(--atencao-bg); border-color: var(--atencao); }
+.acoes .escolhida.investigar { background: var(--risco-bg); border-color: var(--risco); }
+
+/* narração */
+.lado { position: sticky; top: 24px; display: flex; flex-direction: column; border-left: 1px solid var(--line); padding-left: 28px; max-height: calc(100vh - 48px); }
+.narracao { min-height: 200px; flex: none; }
+.faixaRot { font-size: var(--t-sm); color: var(--ink-3); margin-bottom: 10px; }
+.etapaTitulo { font-size: var(--t-xl); letter-spacing: -.03em; margin: 0 0 10px; animation: surgir var(--medio) var(--ease); }
+.etapaTexto { font-size: var(--t-md); color: var(--ink-2); line-height: 1.5; margin: 0; }
+.fimAcoes { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+.fimAcoes :global(.btn) { justify-content: flex-start; }
+
+.progresso { flex: none; display: block; width: 100%; border: 0; padding: 18px 0 16px; margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; text-align: left; }
+.progresso:hover:not(:disabled) { background: transparent; }
+.trilhoTempo { display: block; height: 2px; background: var(--line); overflow: hidden; border-radius: 2px; }
+.trilhoTempo i { display: block; height: 100%; background: var(--zuper-forte); transform-origin: left; }
+.tempo { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; font-size: var(--t-xs); color: var(--ink-3); font-weight: 400; }
+
+.historico { list-style: none; margin: 0; padding: 16px 0 0; overflow-y: auto; flex: 1; min-height: 120px; scrollbar-width: thin; scrollbar-color: var(--line-forte) transparent; }
+.historico li { padding: 0 0 14px; animation: surgir var(--medio) var(--ease); }
+.historico button { border: 0; padding: 0; background: none; font-size: var(--t-sm); font-weight: 600; color: var(--ink); gap: 8px; }
+.historico button:hover:not(:disabled) { background: none; color: var(--zuper-forte); }
+.historico p { font-size: var(--t-xs); color: var(--ink-3); margin: 3px 0 0 14px; line-height: 1.45; }
+.ponto1, .ponto2, .ponto3 { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.ponto1 { background: var(--zuper); }
+.ponto2 { background: var(--intel); }
+.ponto3 { background: var(--atencao); }
+
+.rodape { margin-top: auto; padding-top: 40px; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px 32px; flex-wrap: wrap; }
+.rodape p.aviso { display: block; max-width: 70ch; }
+.rodape p { margin: 0; font-size: var(--t-sm); color: var(--ink-3); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.reais { gap: 6px 24px !important; }
+.reais b { color: var(--ink-2); }
+
+@media (max-width: 1280px) {
+  .area { grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; }
+  .palco { column-gap: 48px; }
+  .rotulo small { display: none; }
+}
+@media (max-width: 900px) {
+  .area { grid-template-columns: 1fr; }
+  .lado { position: static; border-left: 0; padding-left: 0; grid-row: 1; max-height: none; }
+  .historico { display: none; }
+  .narracao { min-height: 150px; }
+  .palco { grid-template-columns: 1fr; row-gap: 14px; }
+  .palco > * { grid-column: 1 !important; grid-row: auto !important; }
+  .faixa { margin-top: 20px; }
+  .rotulo small { display: block; }
+  .cenario { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .traco.vivo { animation: none; stroke-dasharray: none; } }

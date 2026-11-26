@@ -8,6 +8,7 @@ export const REPO = "https://github.com/douglas-data99/zuper-fraud-intelligence"
 
 const I = {
   painel: "M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z",
+  rede: "M5 6a2 2 0 1 0 0-.01M19 6a2 2 0 1 0 0-.01M12 18a2 2 0 1 0 0-.01M5 8v3a3 3 0 0 0 3 3h3m8-6v3a3 3 0 0 1-3 3h-3m-1 0v2",
   cartao: "M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm0 4h18",
   balanca: "M12 3v18M5 7h14M5 7l-3 7a4 4 0 0 0 6 0zm14 0-3 7a4 4 0 0 0 6 0z",
   frasco: "M9 3h6M10 3v6L4 19a1.5 1.5 0 0 0 1.3 2h13.4a1.5 1.5 0 0 0 1.3-2L14 9V3",
@@ -20,12 +21,15 @@ function Icone({ d }: { d: string }) {
 }
 
 const GRUPOS = [
-  { nome: "Business", itens: [
-    { href: "/", rotulo: "Visão executiva", ic: I.painel },
+  { nome: "", itens: [
+    { href: "/", rotulo: "Como funciona", ic: I.rede },
+  ] },
+  { nome: "Negócio", itens: [
+    { href: "/operacoes", rotulo: "Centro de operações", ic: I.painel },
     { href: "/simulador", rotulo: "Simulador bancário", ic: I.cartao },
     { href: "/decisao", rotulo: "Motor de decisão", ic: I.balanca },
   ] },
-  { nome: "Technology", itens: [
+  { nome: "Tecnologia", itens: [
     { href: "/lab", rotulo: "Data Science Lab", ic: I.frasco },
     { href: "/monitoramento", rotulo: "Monitoramento do modelo", ic: I.pulso },
     { href: "/mlops", rotulo: "Engenharia e MLOps", ic: I.camadas },
@@ -34,9 +38,9 @@ const GRUPOS = [
 
 function Marca() {
   return (
-    <Link href="/" className="marca" aria-label="Zuper Fraud Intelligence: visão executiva">
-      <span className="z"><LogoZ tamanho={15} /></span>
-      <span><b>ZUPER FRAUD</b><small>Intelligence platform</small></span>
+    <Link href="/" className="marca" aria-label="Zuper Fraud Intelligence: como funciona">
+      <span className="z"><LogoZ tamanho={18} /></span>
+      <span><b>Zuper Fraud</b><small>Intelligence</small></span>
     </Link>
   );
 }
@@ -68,7 +72,7 @@ export default function Lateral() {
         <nav className="nav">
           {GRUPOS.map((g) => (
             <div key={g.nome}>
-              <div className="grupo">{g.nome}</div>
+              {g.nome && <div className="grupo">{g.nome}</div>}
               {g.itens.map((i) => (
                 <Link key={i.href} href={i.href} aria-current={atual === i.href ? "page" : undefined}>
                   <Icone d={i.ic} />{i.rotulo}
@@ -80,7 +84,7 @@ export default function Lateral() {
           <a href={REPO} target="_blank" rel="noreferrer"><Icone d={I.codigo} />Evidências e código<span className="ext" aria-label="abre o GitHub">↗</span></a>
         </nav>
         <div className="rodape">
-          <b>Dados sintéticos · USD</b><br />
+          <b>Dados sintéticos em USD</b>
           Projeto de portfólio de Douglas Caldeira Silva. Base pública Sparkov (CC0). Sem ligação com nenhum banco real.
         </div>
       </aside>

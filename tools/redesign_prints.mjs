@@ -6,10 +6,10 @@ import { mkdirSync, writeFileSync } from "node:fs";
 const EXE = `${process.env.LOCALAPPDATA}/ms-playwright/chromium-1243/chrome-win64/chrome.exe`;
 const ANTES = process.env.ANTES || "https://zuper-fraud-intelligence.vercel.app";
 const DEPOIS = process.env.DEPOIS || "http://localhost:3000";
-const OUT = "../docs/redesign";
+const OUT = process.env.OUT || "../docs/redesign";
 const modo = process.argv[2] || "tudo";
 const TAMANHOS = [["1440", 1440, 900, false], ["1920", 1920, 1080, false], ["390", 390, 844, true]];
-const ROTAS = { antes: ["/", "/simulador", "/decisao", "/lab", "/mlops"], depois: ["/", "/simulador", "/decisao", "/lab", "/monitoramento", "/mlops"] };
+const ROTAS = { antes: ["/", "/simulador", "/decisao", "/lab", "/mlops"], depois: ["/", "/operacoes", "/simulador", "/decisao", "/lab", "/monitoramento", "/mlops"] };
 const nomeRota = (r) => (r === "/" ? "inicio" : r.slice(1));
 
 const browser = await chromium.launch({ executablePath: EXE, args: ["--force-color-profile=srgb"] });
@@ -48,7 +48,22 @@ async function interacoes() {
   const ctx = await contexto(1440, 900, false);
   const page = await ctx.newPage();
   // 1) números-chave da visão executiva
+  // 0) tela inicial: apresentação interativa
   await page.goto(DEPOIS + "/", { waitUntil: "networkidle" });
+  await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Iniciar apresentação" }).click();
+  await page.waitForTimeout(3600);
+  ok("apresentação avança sozinha em 3 s", (await page.locator("[aria-live=polite]").first().innerText()).startsWith("2 de"));
+  await page.locator("button[aria-label^='Pausar']").first().hover();
+  await page.getByRole("button", { name: /Pausar/ }).first().click();
+  for (let k = 0; k < 20; k++) await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(500);
+  ok("navegação manual chega à última etapa", (await page.locator("[aria-live=polite]").first().innerText()).startsWith("18 de"));
+  await page.getByRole("button", { name: "Reiniciar" }).click();
+  ok("reiniciar volta ao início", (await page.locator("[aria-live=polite]").first().innerText()).trim() === "—");
+  const logosExternas = await page.evaluate(() => [...document.images].filter((i) => !i.src.startsWith(location.origin)).length);
+  ok("logos carregadas localmente", logosExternas === 0, `${logosExternas} externas`);
+  await page.goto(DEPOIS + "/operacoes", { waitUntil: "networkidle" });
   await page.waitForTimeout(2500);
   const txt = await page.locator("main").innerText();
   for (const n of ["555.719", "2.145", "38.562.903", "1.133.325", "1.029.297", "551.169", "1.647", "2.903", "1.063.240", "99,18%", "0,30%", "0,52%", "0,82%", "99,3%"])
@@ -65,20 +80,21 @@ async function interacoes() {
   // 2) simulador: cenário + what-if + transação com evento
   await page.goto(DEPOIS + "/simulador", { waitUntil: "networkidle" });
   await page.waitForTimeout(2500);
-  const cen = page.locator("button.cenario");
+  const cen = page.getByRole("group", { name: "Cenários reproduzíveis" }).getByRole("button");
   ok("cenários carregados da API", (await cen.count()) === 3, `${await cen.count()} cenários`);
   await cen.nth(2).click();
   await page.waitForTimeout(2500);
   await page.getByRole("button", { name: "Simular sem gravar (what-if)" }).click();
-  await page.waitForSelector(".resultado-pag", { timeout: 15000 });
-  await page.waitForTimeout(800);
-  const wi = await page.locator(".resultado-pag").innerText();
-  ok("what-if responde sem gravar", wi.includes("nada foi gravado"), wi.split("\n")[0]);
+  await page.getByText(/nada foi gravado/i).first().waitFor({ timeout: 15000 });
+  await page.waitForTimeout(2500);
+  ok("what-if responde sem gravar", true);
   await page.screenshot({ path: `${OUT}/depois/simulador-whatif-1440.png`, fullPage: true });
+  const nova = page.getByRole("button", { name: "Nova compra" });
+  if (await nova.count()) await nova.first().click();
   await cen.nth(0).click();
   await page.waitForTimeout(2500);
   await page.getByRole("button", { name: /^Pagar/ }).click();
-  await page.waitForSelector(".resultado-pag", { timeout: 15000 });
+  await page.getByText("Transação registrada com evento").first().waitFor({ timeout: 15000 });
   await page.waitForTimeout(6000);
   const tr = await page.locator("main").innerText();
   ok("transação com evento registrada", tr.includes("Transação registrada com evento"));

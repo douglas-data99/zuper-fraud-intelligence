@@ -1,0 +1,72 @@
+/* Centro de operações */
+
+/* momento principal: o benefício, sem caixa */
+.heroi { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px 64px; align-items: end; padding: 8px 0 40px; }
+.heroiRot { font-size: var(--t-sm); font-weight: 500; color: var(--ink-2); margin: 0 0 14px; letter-spacing: 0; }
+.heroiTexto { font-size: var(--t-md); color: var(--ink-2); margin: 18px 0 0; max-width: 52ch; }
+.heroiAcoes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
+
+.comparativo { display: grid; gap: 18px; padding-bottom: 4px; }
+.compLinha { display: grid; gap: 8px; }
+.compTopo { display: flex; justify-content: space-between; gap: 12px; font-size: var(--t-sm); color: var(--ink-2); }
+.compTopo b { font-variant-numeric: tabular-nums; font-weight: 600; }
+.compTrilho { height: 4px; background: var(--line-soft); border-radius: 2px; overflow: hidden; }
+.compTrilho span { display: block; height: 100%; border-radius: 2px; transform-origin: left; animation: crescer .8s var(--ease) both; }
+.compRisco { background: var(--risco); }
+.compProtecao { background: var(--protecao); animation-delay: .15s !important; }
+@keyframes crescer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* três números de peso médio */
+.principais { padding: 28px 0; border-top: 1px solid var(--line); }
+
+/* linha secundária, menor */
+.secundarios { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 0; padding: 18px 0 0; border-top: 1px solid var(--line-soft); }
+.secundarios > div { padding-right: 20px; min-width: 0; }
+.secundarios dt { font-size: var(--t-xs); color: var(--ink-3); margin-bottom: 4px; }
+.secundarios dd { margin: 0; font-size: var(--t-md); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.01em; color: var(--ink); }
+.secundarios dd small { display: block; font-size: var(--t-xs); font-weight: 400; color: var(--ink-3); letter-spacing: 0; margin-top: 2px; }
+
+/* fluxo em linhas, sem caixas */
+.fluxo { display: grid; font-variant-numeric: tabular-nums; }
+.fluxoCab, .fluxoLinha { display: grid; grid-template-columns: minmax(190px, 1.4fr) minmax(160px, 2fr) repeat(3, minmax(80px, .7fr)); gap: 16px; align-items: center; }
+.fluxoCab { font-size: var(--t-xs); color: var(--ink-3); padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.fluxoLinha { padding: 16px 0; border-bottom: 1px solid var(--line-soft); font-size: .875rem; color: var(--ink-2); }
+.n { text-align: right; }
+.acaoNome { display: flex; gap: 12px; align-items: flex-start; }
+.acaoNome i { font-style: normal; width: 20px; height: 20px; border-radius: var(--r-1); display: grid; place-items: center; font-size: .7rem; font-weight: 700; flex: none; margin-top: 1px; }
+.acaoNome b { display: block; font-weight: 600; }
+.acaoNome small { display: block; font-size: var(--t-xs); color: var(--ink-3); margin-top: 1px; }
+.part { display: flex; align-items: center; gap: 14px; }
+.pct { font-size: var(--t-lg); font-weight: 600; letter-spacing: -.03em; min-width: 76px; }
+.trilho { flex: 1; height: 4px; background: var(--line-soft); border-radius: 2px; overflow: hidden; }
+.trilho span { display: block; height: 100%; border-radius: 2px; }
+.aprovar .acaoNome i { background: var(--protecao-bg); color: var(--protecao); }
+.aprovar .pct { color: var(--protecao); }
+.aprovar .trilho span { background: var(--protecao); }
+.autenticar .acaoNome i { background: var(--atencao-bg); color: var(--atencao); }
+.autenticar .pct { color: var(--atencao); }
+.autenticar .trilho span { background: var(--atencao); }
+.investigar .acaoNome i { background: var(--risco-bg); color: var(--risco); }
+.investigar .pct { color: var(--risco); }
+.investigar .trilho span { background: var(--risco); }
+.passou { color: var(--risco); }
+
+/* operação ao vivo: linha discreta */
+.vivo { margin-top: 40px; }
+.vivoCab { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.vivoCab h2 { font-size: var(--t-md); margin: 0; }
+.vivoSub { font-size: var(--t-xs); color: var(--ink-3); }
+.vivo .secundarios { margin-top: 14px; }
+
+@media (max-width: 1180px) {
+  .heroi { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .secundarios { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
+  .fluxoCab { display: none; }
+  .fluxoLinha { grid-template-columns: 1fr auto; row-gap: 8px; }
+  .fluxoLinha .part { grid-column: 1 / -1; order: 2; }
+  .fluxoLinha > .n { display: none; }
+  .fluxoLinha > .n:nth-child(3) { display: block; grid-row: 1; grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) { .compTrilho span { animation: none; } }
