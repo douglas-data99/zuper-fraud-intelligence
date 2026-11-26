@@ -122,6 +122,7 @@ A linha de base do acaso é a prevalência do teste, 0,39%. O Optuna empatou com
 | Teste de carga | `reports/metrics/carga.json` (VPS com 2 vCPU compartilhada: 7,5 req/s, p50 de 512 ms ponta a ponta Brasil→Helsinque, 0% de erro) |
 | Consumo de BigQuery | `reports/metrics/bigquery_consumo.jsonl`: cerca de 1,5 GiB faturado em todo o projeto, dentro da faixa gratuita. Projeto com teto de R$ 50 e cota de 20 GiB/dia |
 | Leituras do teste | `reports/metrics/leituras_do_teste.json`: o teste foi lido 3 vezes. A 3ª leitura foi motivada por bugs apontados pela revisão, não pelo resultado |
+| Progresso completo (linha do tempo, decisões, pendências) | [`docs/PROGRESSO.md`](docs/PROGRESSO.md) |
 | MLflow | `docs/prints/mlflow-*.png` (o servidor é privado, acessível por túnel SSH) |
 
 ## Como rodar
