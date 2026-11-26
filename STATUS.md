@@ -30,7 +30,8 @@
 | Persistência no BigQuery (predictions, decisions + views sem duplicata) | ✅ | `v_auditoria_diaria` |
 | Challenger em modo sombra (cortes de mesma taxa de alerta) | ✅ | teste "shadow nunca muda a decisão" |
 | Replay, rótulo em D+30, safra madura, PSI | ✅ rodando na VPS | `/architecture/status`, `/metrics` |
-| Interface com 5 páginas | ✅ no ar | prints em `docs/prints/` |
+| Interface com 6 páginas (redesign executivo de 26/11) | ✅ no ar | `docs/redesign/` (antes × depois, verificação 43/43) |
+| Monitoramento do modelo (mês a mês, modelo congelado) | ✅ no ar | `reports/metrics/monitoramento.json`, `pipelines/monitoramento.py` |
 | 41 testes automatizados | ✅ 41/41 | `reports/test_results/` |
 | Teste de carga | ✅ | `carga.json`: 7,5 req/s, p50 de 512 ms ponta a ponta, 0% de erro |
 | Trava de custo no GCP | ✅ | orçamento de R$ 50 + cota de 20 GiB/dia; gasto até agora: cerca de 1,5 GiB faturado (faixa grátis) |
