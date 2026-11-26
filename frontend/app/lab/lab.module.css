@@ -31,3 +31,15 @@
   .ablacao { grid-template-columns: 1fr 1fr; }
   .ablacaoBarra { grid-column: 1 / -1; grid-row: 2; }
 }
+
+/* qualidade dos dados: volume, achados relevantes e checagens sem ocorrência */
+.qualidade dd { font-variant-numeric: tabular-nums; font-size: var(--t-md); font-weight: 600; }
+.achados { margin-top: 20px; display: grid; gap: 0; }
+.achado { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 12px 0 12px 14px; border-left: 2px solid var(--atencao); border-bottom: 1px solid var(--line-soft); }
+.achado + .achado { margin-top: 8px; }
+.achadoNum { font-size: var(--t-lg); font-weight: 600; letter-spacing: -.02em; color: var(--atencao); font-variant-numeric: tabular-nums; }
+.achado b { font-size: var(--t-sm); }
+.achado p { font-size: var(--t-sm); color: var(--ink-3); margin: 2px 0 0; }
+.semOcorrencia { font-size: var(--t-sm); color: var(--ink-3); margin-top: 16px; }
+.semOcorrencia b { color: var(--ink-2); font-weight: 500; }
+@media (max-width: 640px) { .achado { grid-template-columns: 1fr; gap: 4px; } }

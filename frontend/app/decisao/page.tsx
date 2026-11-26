@@ -150,7 +150,7 @@ export default function Decisao() {
               { type: "bar", orientation: "h", name: "Custo de análise", y: linhas, x: oper, marker: { color: COR.intel }, hovertemplate: dica("Custo de análise", oper) },
               { type: "bar", orientation: "h", name: "Atrito com clientes bons", y: linhas, x: atr, marker: { color: COR.atencao }, hovertemplate: dica("Atrito", atr) },
             ]} layout={{ barmode: "stack", bargap: 0.42, margin: { l: 130, r: 16, t: 8, b: 40 }, legend: { orientation: "h", y: -0.28 },
-              xaxis: { tickprefix: "US$ ", tickformat: "~s", fixedrange: true, rangemode: "tozero" }, yaxis: { autorange: "reversed", fixedrange: true } }} />
+              xaxis: { tickprefix: "US$ ", tickformat: "~s", fixedrange: true, rangemode: "tozero", nticks: 5 }, yaxis: { autorange: "reversed", fixedrange: true } }} />
             <table className={e.conta}>
               <tbody>
                 <tr><td>Perda se aprovasse tudo</td><td className="n">{fmt.usd(aprovarTudo)}</td></tr>

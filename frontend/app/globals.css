@@ -107,7 +107,9 @@ code, .mono { font-family: var(--mono); font-size: .86em; }
 .regua { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
 
 /* números com peso */
-.cifra { font-variant-numeric: tabular-nums; letter-spacing: -.035em; font-weight: 600; line-height: 1; color: var(--ink); }
+.cifra { font-variant-numeric: tabular-nums; letter-spacing: -.035em; font-weight: 600; line-height: 1.1; color: var(--ink); }
+.cifra + .legenda { margin-top: 10px; }
+.legenda + .cifra { margin-top: 6px; }
 .cifra.xl { font-size: clamp(2.75rem, 1.8rem + 3.2vw, 4.5rem); letter-spacing: -.05em; }
 .cifra.l { font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.35rem); }
 .cifra.m { font-size: 1.5rem; }
@@ -243,5 +245,6 @@ details.inline > summary::-webkit-details-marker { display: none; }
   .grade.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .card { padding: 16px; }
   .cabeca { margin-bottom: 24px; padding-bottom: 20px; }
+  .metricas { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }

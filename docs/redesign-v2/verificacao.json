@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-26T16:36:59.235Z",
+  "gerado_em": "2026-11-26T17:29:11.964Z",
   "erros_console": [],
   "verificacoes": [
     {
@@ -106,6 +106,151 @@
       "nome": "sem rolagem lateral /mlops @390",
       "ok": true,
       "det": "scrollWidth=390"
+    },
+    {
+      "nome": "apresentação avança sozinha em 1,5 s",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "navegação manual chega à última etapa",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "reiniciar volta ao início",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "logos carregadas localmente",
+      "ok": true,
+      "det": "0 externas"
+    },
+    {
+      "nome": "número na visão executiva: 555.719",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 2.145",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 38.562.903",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 1.133.325",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 1.029.297",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 551.169",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 1.647",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 2.903",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 1.063.240",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 99,18%",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 0,30%",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 0,52%",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 0,82%",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "número na visão executiva: 99,3%",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "ações somam 555.719",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "visão técnica abre com AP do Champion",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "cenários carregados da API",
+      "ok": true,
+      "det": "3 cenários"
+    },
+    {
+      "nome": "what-if responde sem gravar",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "transação com evento registrada",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "trilha mostra persistência assíncrona",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "slider de corte recalcula o benefício (janela policy)",
+      "ok": true,
+      "det": "Benefício líquido\tUS$ 429.977 → Benefício líquido\tUS$ 429.149"
+    },
+    {
+      "nome": "volta à política congelada",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "bloco do teste é somente leitura (sem inputs)",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "monitoramento alterna para semanal",
+      "ok": true,
+      "det": ""
+    },
+    {
+      "nome": "menu móvel navega e fecha",
+      "ok": true,
+      "det": ""
     }
   ]
 }

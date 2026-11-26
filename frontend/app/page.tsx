@@ -11,7 +11,7 @@ type No = { k: string; nome: string; papel: string; faixa: Faixa; linha: number;
 type Etapa = { k: string; texto: string };
 
 const NOS: No[] = [
-  { k: "tx", nome: "Pagamento", papel: "cartão, valor, loja, horário", faixa: 1, linha: 1, glifo: "cartao" },
+  { k: "tx", nome: "Pagamento", papel: "valor, loja e horário", faixa: 1, linha: 1, glifo: "cartao" },
   { k: "api", nome: "FastAPI", papel: "recepção e validação", faixa: 1, linha: 2, logo: "/logos/fastapi.svg" },
   { k: "redis", nome: "Redis", papel: "feature store online", faixa: 1, linha: 3, logo: "/logos/redis.svg" },
   { k: "xgb", nome: "XGBoost", papel: "inferência", faixa: 1, linha: 4, logo: "/logos/xgboost.png" },

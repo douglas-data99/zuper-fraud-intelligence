@@ -184,12 +184,56 @@ export default function Lab() {
         </div>
       </section>
 
-      {q && (
-        <section className="bloco">
-          <div className="lado"><h2>Qualidade dos dados</h2><p>Checagens da camada Silver no BigQuery.</p></div>
-          <dl className={`corpo ${l.qualidade}`}>{Object.entries<string>(q).map(([k, v]) => <div key={k}><dt>{k.replaceAll("_", " ")}</dt><dd className="mono">{v}</dd></div>)}</dl>
-        </section>
-      )}
+      {q && (() => {
+        const n = (k: string) => (q[k] == null ? null : Number(q[k]));
+        const volume = [
+          { k: "linhas", nome: "Transações", v: fmt.num(n("linhas")) },
+          { k: "cartoes", nome: "Cartões", v: fmt.num(n("cartoes")) },
+          { k: "merchants", nome: "Lojas", v: fmt.num(n("merchants")) },
+          { k: "maior_valor_fraude", nome: "Maior valor de fraude", v: fmt.usd(n("maior_valor_fraude"), 2) },
+        ].filter((x) => q[x.k] != null);
+        const achados = [
+          { k: "transacoes_acima_maior_fraude", nome: "Transações acima da maior fraude", nota: `todas legítimas: nenhuma fraude passa de ${fmt.usd(n("maior_valor_fraude"), 2)}. É um atalho do gerador, medido no teste de estresse C3.` },
+          { k: "empates_mesmo_cartao_mesmo_segundo", nome: "Compras do mesmo cartão no mesmo segundo", nota: "o desempate pelo ID da transação evita que uma compra enxergue a outra nas features (vazamento)." },
+        ].filter((x) => q[x.k] != null);
+        const NOMES: Record<string, string> = {
+          colisao_hash_cartao: "Colisão no código anônimo do cartão",
+          tx_id_duplicado: "IDs de transação duplicados",
+          nulos_chave: "Campos-chave vazios",
+          valor_nao_positivo: "Valores zero ou negativos",
+          perfis_com_mais_de_um_endereco: "Cartões com mais de um endereço",
+        };
+        const usados = new Set([...volume, ...achados].map((x) => x.k));
+        const legivel = (k: string) => NOMES[k] ?? (k.charAt(0).toUpperCase() + k.slice(1).replaceAll("_", " "));
+        const resto = Object.keys(q).filter((k) => !usados.has(k));
+        const zeros = resto.filter((k) => n(k) === 0);
+        const outros = resto.filter((k) => n(k) !== 0);
+        return (
+          <section className="bloco">
+            <div className="lado"><h2>Qualidade dos dados</h2><p>Checagens da camada Silver no BigQuery, antes de qualquer modelo.</p></div>
+            <div className="corpo">
+              <dl className={l.qualidade}>{volume.map((x) => <div key={x.k}><dt>{x.nome}</dt><dd>{x.v}</dd></div>)}</dl>
+              <div className={l.achados}>
+                {achados.map((x) => (
+                  <div key={x.k} className={l.achado}>
+                    <div className={l.achadoNum}>{fmt.num(n(x.k))}</div>
+                    <div><b>{x.nome}</b><p>{x.nota}</p></div>
+                  </div>
+                ))}
+                {outros.map((k) => (
+                  <div key={k} className={l.achado}>
+                    <div className={l.achadoNum}>{fmt.num(n(k))}</div>
+                    <div><b>{legivel(k)}</b></div>
+                  </div>
+                ))}
+              </div>
+              {zeros.length > 0 && (
+                <p className={l.semOcorrencia}><b>Verificações sem ocorrência:</b> {zeros.map(legivel).join("; ")}.</p>
+              )}
+            </div>
+          </section>
+        );
+      })()}
 
       <section className="bloco">
         <div className="lado"><h2>Limitações</h2><p>O que este resultado não prova.</p></div>
