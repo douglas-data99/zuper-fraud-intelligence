@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import "./legado.css";
 import Lateral from "@/components/Navegacao";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans", display: "swap" });

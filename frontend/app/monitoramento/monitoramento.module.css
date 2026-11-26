@@ -1,0 +1,68 @@
+/* Monitoramento do modelo: linguagem de observabilidade */
+.status { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: start; padding: 4px 0 4px 16px; border-left: 2px solid var(--line-forte); margin-bottom: 36px; }
+.status.atencao { border-left-color: var(--atencao); }
+.status.ok { border-left-color: var(--protecao); }
+.status .tag { font-size: var(--t-sm); font-weight: 600; white-space: nowrap; }
+.status.atencao .tag { color: var(--atencao); }
+.status.ok .tag { color: var(--protecao); }
+.status p { margin: 0; font-size: var(--t-base); color: var(--ink-2); max-width: 90ch; }
+
+/* indicadores com pesos diferentes: o primeiro manda */
+.indicadores { display: grid; grid-template-columns: minmax(240px, 1.4fr) repeat(3, minmax(0, 1fr)); align-items: start; padding-bottom: 32px; }
+.indicadores > div { padding: 0 24px; min-width: 0; }
+.indicadores > div:first-child { padding-left: 0; }
+.indicadores > div + div { border-left: 1px solid var(--line); }
+.indicadores .rot { font-size: var(--t-sm); color: var(--ink-2); margin-bottom: 10px; }
+.indicadores .v { font-size: 1.75rem; font-weight: 600; letter-spacing: -.035em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.indicadores .principal .v { font-size: clamp(2.6rem, 1.8rem + 2.4vw, 3.75rem); letter-spacing: -.05em; color: var(--protecao); }
+.indicadores .sub { font-size: var(--t-xs); color: var(--ink-3); margin-top: 8px; line-height: 1.45; }
+.protecao { color: var(--protecao); }
+.atencaoC { color: var(--atencao); }
+.risco { color: var(--risco); }
+.intel { color: var(--intel); }
+
+.leitura { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 14px; }
+.leitura li { font-size: var(--t-sm); color: var(--ink-2); line-height: 1.55; padding-left: 12px; border-left: 1px solid var(--line-forte); }
+.leitura b { display: block; color: var(--ink); margin-bottom: 2px; }
+
+.legendaImaturo { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-xs); color: var(--ink-3); }
+.legendaImaturo i { width: 14px; height: 10px; background: rgba(232, 176, 74, .18); border: 1px solid rgba(232, 176, 74, .45); border-radius: 2px; display: inline-block; }
+
+.duas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 48px; }
+.duas h3 { font-size: var(--t-sm); margin: 0 0 2px; }
+.duas .desc { font-size: var(--t-xs); color: var(--ink-3); margin: 0 0 8px; }
+
+.psi { display: inline-flex; gap: 8px; align-items: baseline; justify-content: flex-end; font-family: var(--mono); font-size: .78rem; color: var(--ink-2); }
+.psi i { font-style: normal; font-family: var(--font-sans); font-size: .7rem; min-width: 54px; text-align: left; }
+.psi.estavel i { color: var(--ink-3); }
+.psi.atencaoP { color: var(--atencao); }
+.psi.atencaoP i { color: var(--atencao); }
+.psi.investigarP { color: var(--risco); font-weight: 600; }
+.psi.investigarP i { color: var(--risco); }
+
+.rotulo { font-size: var(--t-xs); }
+.rotulo.maduro { color: var(--ink-3); }
+.rotulo.imaturo { color: var(--atencao); }
+.alarme { color: var(--atencao); font-size: var(--t-xs); }
+.semAlarme { color: var(--ink-3); font-size: var(--t-xs); }
+.dias { font-size: var(--t-xs); color: var(--ink-3); margin-left: 6px; font-weight: 400; }
+
+.regras td:first-child { color: var(--ink); }
+.passos { counter-reset: p; list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.passos li { counter-increment: p; display: grid; grid-template-columns: 26px 1fr; gap: 12px; font-size: var(--t-sm); color: var(--ink-2); line-height: 1.55; }
+.passos li::before { content: counter(p); width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line-forte); color: var(--ink-2); display: grid; place-items: center; font-size: var(--t-xs); font-variant-numeric: tabular-nums; }
+.passos b { color: var(--ink); }
+.fonte { font-size: var(--t-xs); color: var(--ink-3); margin-top: 8px; }
+
+@media (max-width: 1180px) {
+  .indicadores { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; }
+  .indicadores > div:nth-child(3) { border-left: 0; padding-left: 0; }
+}
+@media (max-width: 900px) {
+  .duas { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .indicadores { grid-template-columns: 1fr; }
+  .indicadores > div { border-left: 0 !important; padding: 0 0 16px !important; border-bottom: 1px solid var(--line-soft); }
+  .status { grid-template-columns: 1fr; gap: 6px; }
+}

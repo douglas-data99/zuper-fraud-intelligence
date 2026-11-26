@@ -1,0 +1,33 @@
+/* Data Science Lab: estrutura editorial (blocos do design system) com detalhes analíticos */
+.linhaTempo { display: flex; height: 10px; gap: 2px; margin: 2px 0 18px; border-radius: 2px; overflow: hidden; }
+.linhaTempo > div { min-width: 6px; }
+.marca { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 8px; vertical-align: 0; }
+
+.modelos td:first-child { white-space: nowrap; }
+.papel { margin-left: 8px; font-size: var(--t-xs); font-weight: 500; color: var(--zuper-forte); }
+.ap { display: inline-flex; align-items: center; gap: 10px; justify-content: flex-end; }
+.ap i { display: inline-block; height: 4px; background: var(--intel); border-radius: 2px; flex: none; }
+
+.duas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.grafTit { font-size: var(--t-sm); color: var(--ink-2); font-weight: 500; margin: 0 0 6px; }
+
+.ablacao { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 28px; align-items: end; max-width: 760px; }
+.ablacaoBarra { position: relative; height: 2px; background: var(--line-forte); margin-bottom: 14px; }
+.ablacaoBarra span { position: absolute; top: -3px; height: 8px; background: var(--protecao-bg); border-top: 2px solid var(--protecao); }
+.ablacaoBarra i { position: absolute; top: -6px; width: 2px; height: 14px; background: var(--ink-2); transform: translateX(-1px); }
+
+.grupo td { color: var(--ink-3); font-size: var(--t-xs); padding-top: 18px; border-bottom-color: var(--line); background: none !important; }
+
+.qualidade { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0 24px; margin: 0; }
+.qualidade div { padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
+.qualidade dt { font-size: var(--t-xs); color: var(--ink-3); }
+.qualidade dd { margin: 2px 0 0; color: var(--ink); }
+
+.limites { margin: 0; padding-left: 18px; display: grid; gap: 10px; max-width: 76ch; }
+.limites li { padding-left: 4px; }
+
+@media (max-width: 1180px) { .duas { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .ablacao { grid-template-columns: 1fr 1fr; }
+  .ablacaoBarra { grid-column: 1 / -1; grid-row: 2; }
+}

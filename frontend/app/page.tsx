@@ -193,8 +193,10 @@ export default function ComoFunciona() {
     if (!rodando) { ultimo.current = null; return; }
     let raf = 0;
     const passo = (t: number) => {
-      if (ultimo.current != null && !pausaMouse) setDecorrido((e) => Math.min(DURACAO, e + Math.min(t - (ultimo.current as number), 100)));
+      // o intervalo é calculado antes de atualizar a referência (o setState roda depois)
+      const dt = ultimo.current == null ? 0 : Math.min(t - ultimo.current, 250);
       ultimo.current = t;
+      if (dt > 0 && !pausaMouse) setDecorrido((e) => Math.min(DURACAO, e + dt));
       raf = requestAnimationFrame(passo);
     };
     raf = requestAnimationFrame(passo);

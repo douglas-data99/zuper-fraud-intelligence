@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Grafico, { COR } from "@/components/Grafico";
 import { Cabecalho } from "@/components/Kpi";
 import { dado, fmt } from "@/lib/api";
+import l from "./lab.module.css";
 
 const REPO = "https://github.com/douglas-data99/zuper-fraud-intelligence";
 const DESC: Record<string, string> = {
@@ -30,116 +31,176 @@ export default function Lab() {
   const shap = Object.entries<number>(r.shap_top).slice(0, 12).reverse();
   const splits = Object.entries<any>(r.splits);
   const A = r.ablacao_A_vs_B_teste.A, B = r.ablacao_A_vs_B_teste.B;
+  const FUNCAO: Record<string, string> = { train: "ajuste dos modelos", tuning: "early stopping, Optuna, escolha do Champion", calibration: "calibrador de probabilidade", policy: "cortes da política de custo", test: "avaliação final, intocada" };
+  const COR_JANELA: Record<string, string> = { train: "#2C3A4D", tuning: COR.intel, calibration: "#9C8BD9", policy: COR.atencao, test: COR.protecao };
+  const totalN = splits.reduce((s, [, v]) => s + v.n, 0);
+  const ch = r.teste[r.champion];
+  const C = r.experimento_C_sem_valor;
+  const estresse: [string, string, any][] = [
+    ["Champion completo", "todas as features", B],
+    ["C4", "sem tamanho do histórico e sem tempo desde a última compra", C.C4_sem_historico_curto.teste],
+    ["C3", "Champion avaliado só em compras abaixo de US$ 800", C.C3_champion_abaixo_800.teste],
+    ["C1", "sem as features de valor", C.C1_sem_valor.teste],
+    ["C2", "sem valor e sem velocidade de curto prazo", C.C2_sem_valor_e_rajada.teste],
+  ];
+  const familia = (n: string) => (n.includes(" A") ? "A: só a transação" : n.includes("Dummy") ? "nenhuma" : "B: transação + histórico");
 
   return (
     <>
-      <Cabecalho eyebrow="Technology · Ciência de dados" titulo="Data Science Lab">
-        <p>Dados, protocolo temporal, comparação de modelos, ablação de features, calibração, explicabilidade e limites. Código e relatório em <a href={REPO} target="_blank" rel="noreferrer">GitHub</a>.</p>
-        <div className="meta"><span>todos os números vêm dos artefatos gerados pela execução real do pipeline</span></div>
+      <Cabecalho eyebrow="Tecnologia, ciência de dados" titulo="Data Science Lab">
+        <p>Protocolo, modelos, curvas, calibração, explicabilidade e os limites do resultado. Todos os números vêm dos artefatos gerados pela execução do pipeline; código e relatório no <a href={REPO} target="_blank" rel="noreferrer">GitHub</a>.</p>
       </Cabecalho>
 
-      <div className="grade g4 kpis">
-        <div className="card kpi"><div className="rot">Transações</div><div className="val">{fmt.num(ing?.bronze?.linhas)}</div><div className="def">Sparkov (CC0) · {q ? `${fmt.num(Number(q.cartoes))} cartões, ${fmt.num(Number(q.merchants))} lojas` : "N/D"} · SHA-256 conferido na ingestão</div></div>
-        <div className="card kpi"><div className="rot">Fraude no teste</div><div className="val">{fmt.pct(r.teste[r.champion].prevalencia, 2)}</div><div className="def">linha de base da curva PR (o acaso)</div></div>
-        <div className="card kpi"><div className="rot">AP do Champion (teste)</div><div className="val">{r.teste[r.champion].AP.toFixed(3)}</div><div className="def">{r.champion}</div></div>
-        <div className="card kpi"><div className="rot">Ganho do histórico (AP)</div><div className="val">+{((B.AP - A.AP) * 100).toFixed(1)} p.p.</div><div className="def">mesmas linhas de teste: {A.AP.toFixed(3)} → {B.AP.toFixed(3)}</div></div>
-      </div>
-
-      <div className="secao card">
-        <h2>Protocolo temporal</h2>
-        <p>O modelo aprende com o passado e é cobrado no futuro. Cada janela tem uma única função; o teste (arquivo de teste original) só é tocado depois de modelo, calibrador e política estarem salvos.</p>
-        <div className="tabela-rolar"><table>
-          <thead><tr><th>Janela</th><th>Função</th><th>Início</th><th>Fim</th><th className="n">Transações</th><th className="n">Fraudes</th></tr></thead>
-          <tbody>{splits.map(([k, v]) => (
-            <tr key={k}><td className="mono">{k}</td><td>{({ train: "ajuste dos modelos", tuning: "early stopping, Optuna, escolha do Champion", calibration: "calibrador de probabilidade", policy: "cortes da política de custo", test: "avaliação final (intocada)" } as any)[k]}</td>
-              <td>{v.inicio.slice(0, 10)}</td><td>{v.fim.slice(0, 10)}</td><td className="n">{fmt.num(v.n)}</td><td className="n">{fmt.num(v.fraudes)}</td></tr>
-          ))}</tbody></table></div>
-        <p className="nota">Janeiro/2019 serve só como aquecimento do histórico. Features point-in-time: toda janela termina 1 segundo antes da transação (conferido por revisão independente em pandas e pelo teste automatizado de paridade offline × online).</p>
-      </div>
-
-      <div className="secao card">
-        <h2>Comparação de modelos (teste)</h2>
-        <div className="tabela-rolar"><table>
-          <thead><tr><th>Modelo</th><th>Features</th><th className="n">AP (tuning)</th><th className="n">AP (teste)</th><th className="n">PR-AUC trapézio</th><th className="n">ROC-AUC</th><th className="n">Recall a 0,5% FPR</th><th className="n">Recall a 1% FPR</th></tr></thead>
-          <tbody>{nomes.map((n) => (
-            <tr key={n} className={n === r.champion ? "destaque" : ""}><td>{n}{n === r.champion ? " ★" : ""}{n === r.challenger ? " (challenger)" : ""}</td><td>{n.includes(" A") ? "A: transação" : n.includes("Dummy") ? "nenhuma" : "B: + histórico"}</td>
-              <td className="n mono">{r.tuning[n]?.AP.toFixed(4)}</td><td className="n mono">{r.teste[n].AP.toFixed(4)}</td><td className="n mono">{r.teste[n].PR_AUC_trapezio.toFixed(4)}</td>
-              <td className="n mono">{r.teste[n].ROC_AUC.toFixed(4)}</td><td className="n">{fmt.pct(r.teste[n]["recall_fpr_0.5pct"])}</td><td className="n">{fmt.pct(r.teste[n]["recall_fpr_1pct"])}</td></tr>
-          ))}</tbody></table></div>
-        <p className="nota">AP (average precision, soma em degraus) e PR-AUC por trapézio são cálculos diferentes e por isso aparecem separados. Champion escolhido pela AP na janela de tuning, não no teste.</p>
-      </div>
-
-      <div className="secao grade g2">
-        <div className="card">
-          <h2>Precisão × recall</h2>
-          <Grafico data={Object.entries<any>(c.modelos).map(([n, m], i) => ({ type: "scatter", mode: "lines", name: `${n} (AP ${m.AP.toFixed(3)})`, x: m.recall, y: m.precision, line: { color: cores[i], width: i === 0 ? 2.5 : 1.4 } }))}
-            layout={{ xaxis: { title: { text: "recall" } }, yaxis: { title: { text: "precisão" } }, shapes: [{ type: "line", x0: 0, x1: 1, y0: c.prevalencia, y1: c.prevalencia, line: { dash: "dot", color: "#7d8a9a" } }] }} />
+      <section className="bloco primeiro">
+        <div className="lado"><h2>Dados</h2><p>Base pública Sparkov (CC0), sintética. Nome, endereço e número do cartão não entram no modelo; o cartão vira um hash com sal.</p></div>
+        <div className="corpo metricas">
+          <div><div className="rot">Transações</div><div className="cifra l">{fmt.num(ing?.bronze?.linhas)}</div><div className="legenda">{q ? `${fmt.num(Number(q.cartoes))} cartões, ${fmt.num(Number(q.merchants))} lojas` : "N/D"}</div></div>
+          <div><div className="rot">Fraude no teste</div><div className="cifra l">{fmt.pct(ch.prevalencia, 2)}</div><div className="legenda">a linha de base da curva PR</div></div>
+          <div><div className="rot">AP do Champion no teste</div><div className="cifra l intel">{ch.AP.toFixed(3)}</div><div className="legenda">{r.champion}</div></div>
+          <div><div className="rot">Ganho do histórico</div><div className="cifra l protecao">+{((B.AP - A.AP) * 100).toFixed(1)} p.p.</div><div className="legenda">AP {A.AP.toFixed(3)} para {B.AP.toFixed(3)}, mesmas linhas</div></div>
         </div>
-        <div className="card">
-          <h2>ROC (zoom até 5% de FPR)</h2>
-          <Grafico data={Object.entries<any>(c.modelos).map(([n, m], i) => ({ type: "scatter", mode: "lines", name: n, x: m.fpr.map((v: number) => v * 100), y: m.tpr.map((v: number) => v * 100), line: { color: cores[i], width: i === 0 ? 2.5 : 1.4 } }))}
-            layout={{ xaxis: { title: { text: "% legítimas sinalizadas" }, range: [0, 5] }, yaxis: { title: { text: "% fraudes pegas" } } }} />
-        </div>
-      </div>
+      </section>
 
-      <div className="secao grade g2">
-        <div className="card">
-          <h2>Calibração</h2>
-          <Grafico data={[
-            { type: "scatter", mode: "lines+markers", name: "bruto", x: c.calibracao.bruto.previsto, y: c.calibracao.bruto.observado, line: { color: "#94a3B8" } },
-            { type: "scatter", mode: "lines+markers", name: `calibrado (${r.calibracao.escolhida})`, x: c.calibracao.calibrado.previsto, y: c.calibracao.calibrado.observado, line: { color: COR.protecao } },
-            { type: "scatter", mode: "lines", name: "perfeito", x: [1e-5, 1], y: [1e-5, 1], line: { dash: "dot", color: "#7d8a9a" } },
-          ]} layout={{ xaxis: { type: "log", title: { text: "probabilidade prevista" } }, yaxis: { type: "log", title: { text: "fraude observada" } } }} />
-          <p className="nota">Brier no teste: bruto {r.calibracao.brier_teste.bruto.toFixed(5)} → calibrado {r.calibracao.brier_teste.calibrado.toFixed(5)}. Calibrador ajustado na janela calibration e escolhido (isotônico × sigmoide) na janela policy.</p>
+      <section className="bloco">
+        <div className="lado"><h2>Protocolo temporal</h2><p>O modelo aprende com o passado e é cobrado no futuro. Cada janela tem uma só função, e o teste só foi lido depois de modelo, calibrador e política salvos.</p></div>
+        <div className="corpo">
+          <div className={l.linhaTempo} role="img" aria-label="Proporção de transações por janela temporal">
+            {splits.map(([k, v]) => (
+              <div key={k} style={{ flexGrow: v.n / totalN, background: COR_JANELA[k] }} title={`${k}: ${fmt.num(v.n)} transações`} />
+            ))}
+          </div>
+          <div className="tabela-rolar"><table>
+            <thead><tr><th>Janela</th><th>Função</th><th>Início</th><th>Fim</th><th className="n">Transações</th><th className="n">Fraudes</th></tr></thead>
+            <tbody>{splits.map(([k, v]) => (
+              <tr key={k}><td><span className={l.marca} style={{ background: COR_JANELA[k] }} /><span className="mono">{k}</span></td><td>{FUNCAO[k]}</td>
+                <td>{v.inicio.slice(0, 10)}</td><td>{v.fim.slice(0, 10)}</td><td className="n">{fmt.num(v.n)}</td><td className="n">{fmt.num(v.fraudes)}</td></tr>
+            ))}</tbody></table></div>
+          <p className="nota">Janeiro de 2019 só aquece o histórico. Features point-in-time: toda janela de comportamento termina 1 segundo antes da transação, conferido por revisão independente e pelo teste de paridade entre offline e online.</p>
         </div>
-        <div className="card">
-          <h2>O que mais pesa (SHAP global)</h2>
-          <Grafico data={[{ type: "bar", orientation: "h", x: shap.map(([, v]) => v), y: shap.map(([k]) => DESC[k] || k.replace("cat_", "categoria: ")), marker: { color: COR.intel } }]}
-            layout={{ margin: { l: 150, r: 10, t: 10, b: 40 }, xaxis: { title: { text: "média |SHAP| (log-odds do modelo bruto)" } } }} />
-          <p className="nota">Explica o modelo, não a causa da fraude.</p>
-        </div>
-      </div>
+      </section>
 
-      <div className="secao grade g2">
-        <div className="card">
-          <h2>Teste de estresse: atalhos do gerador</h2>
-          <p>Na base Sparkov, nenhuma fraude passa de US$ 1.376 e fraudes vêm em rajada no mesmo cartão. Medimos quanto o modelo depende disso.</p>
-          <table><thead><tr><th>Experimento</th><th className="n">AP teste</th><th className="n">Recall a 1% FPR</th></tr></thead>
-            <tbody>
-              <tr className="destaque"><td>Champion completo</td><td className="n mono">{B.AP.toFixed(4)}</td><td className="n">{fmt.pct(B.recall_fpr_1pct)}</td></tr>
-              <tr><td>C1: sem features de valor</td><td className="n mono">{r.experimento_C_sem_valor.C1_sem_valor.teste.AP.toFixed(4)}</td><td className="n">{fmt.pct(r.experimento_C_sem_valor.C1_sem_valor.teste.recall_fpr_1pct)}</td></tr>
-              <tr><td>C2: sem valor e sem rajada</td><td className="n mono">{r.experimento_C_sem_valor.C2_sem_valor_e_rajada.teste.AP.toFixed(4)}</td><td className="n">{fmt.pct(r.experimento_C_sem_valor.C2_sem_valor_e_rajada.teste.recall_fpr_1pct)}</td></tr>
-              <tr><td>C4: sem tamanho do histórico e sem tempo desde a última</td><td className="n mono">{r.experimento_C_sem_valor.C4_sem_historico_curto.teste.AP.toFixed(4)}</td><td className="n">{fmt.pct(r.experimento_C_sem_valor.C4_sem_historico_curto.teste.recall_fpr_1pct)}</td></tr>
-              <tr><td>C3: Champion só em compras &lt; US$ 800</td><td className="n mono">{r.experimento_C_sem_valor.C3_champion_abaixo_800.teste.AP.toFixed(4)}</td><td className="n">{fmt.pct(r.experimento_C_sem_valor.C3_champion_abaixo_800.teste.recall_fpr_1pct)}</td></tr>
-            </tbody></table>
+      <section className="bloco">
+        <div className="lado"><h2>Comparação de modelos</h2><p>Sete configurações no mesmo teste. O Champion foi escolhido pela AP na janela de tuning, não no teste.</p>
+          <p>AP soma a precisão em degraus; PR-AUC por trapézio interpola a curva. São cálculos diferentes e aparecem separados.</p></div>
+        <div className="corpo tabela-rolar">
+          <table className={l.modelos}>
+            <thead><tr><th>Modelo</th><th>Features</th><th className="n">AP tuning</th><th className="n">AP teste</th><th className="n">PR-AUC trapézio</th><th className="n">ROC-AUC</th><th className="n">Recall a 0,5% FPR</th><th className="n">Recall a 1% FPR</th></tr></thead>
+            <tbody>{nomes.map((n) => (
+              <tr key={n} className={n === r.champion ? "destaque" : ""}>
+                <td>{n}{n === r.champion ? <span className={l.papel}>Champion</span> : n === r.challenger ? <span className={l.papel}>challenger</span> : null}</td>
+                <td>{familia(n)}</td>
+                <td className="n mono">{r.tuning[n]?.AP.toFixed(4)}</td>
+                <td className="n mono"><span className={l.ap}><i style={{ width: `${r.teste[n].AP * 64}px` }} />{r.teste[n].AP.toFixed(4)}</span></td>
+                <td className="n mono">{r.teste[n].PR_AUC_trapezio.toFixed(4)}</td>
+                <td className="n mono">{r.teste[n].ROC_AUC.toFixed(4)}</td>
+                <td className="n">{fmt.pct(r.teste[n]["recall_fpr_0.5pct"])}</td><td className="n">{fmt.pct(r.teste[n]["recall_fpr_1pct"])}</td>
+              </tr>
+            ))}</tbody>
+          </table>
         </div>
-        <div className="card">
-          <h2>Desempenho por segmento (política congelada)</h2>
-          <div className="tabela-rolar" style={{ maxHeight: 300, overflowY: "auto" }}><table>
+      </section>
+
+      <section className="bloco">
+        <div className="lado"><h2>Curvas no teste</h2><p>Precisão contra recall, com a prevalência como linha do acaso, e ROC ampliada até 5% de legítimas sinalizadas, a faixa que importa para um banco.</p></div>
+        <div className={`corpo ${l.duas}`}>
+          <div>
+            <h3 className={l.grafTit}>Precisão × recall</h3>
+            <Grafico altura={300} data={Object.entries<any>(c.modelos).map(([n, m], i) => ({ type: "scatter", mode: "lines", name: `${n} (AP ${m.AP.toFixed(3)})`, x: m.recall, y: m.precision, line: { color: cores[i], width: i === 0 ? 2.5 : 1.3 } }))}
+              layout={{ margin: { l: 44, r: 8, t: 8, b: 40 }, xaxis: { title: { text: "recall" } }, yaxis: { title: { text: "precisão" } }, legend: { orientation: "h", y: -0.3, font: { size: 10 } },
+                shapes: [{ type: "line", x0: 0, x1: 1, y0: c.prevalencia, y1: c.prevalencia, line: { dash: "dot", color: "#7D8A9C" } }] }} />
+          </div>
+          <div>
+            <h3 className={l.grafTit}>ROC até 5% de falso positivo</h3>
+            <Grafico altura={300} data={Object.entries<any>(c.modelos).map(([n, m], i) => ({ type: "scatter", mode: "lines", name: n, x: m.fpr.map((v: number) => v * 100), y: m.tpr.map((v: number) => v * 100), line: { color: cores[i], width: i === 0 ? 2.5 : 1.3 }, showlegend: false }))}
+              layout={{ margin: { l: 44, r: 8, t: 8, b: 40 }, xaxis: { title: { text: "% legítimas sinalizadas" }, range: [0, 5] }, yaxis: { title: { text: "% fraudes pegas" } } }} />
+          </div>
+        </div>
+      </section>
+
+      <section className="bloco">
+        <div className="lado"><h2>Quanto vale o histórico do cliente</h2><p>Ablação: mesmos parâmetros, mesmas linhas de teste. A só vê a transação; B vê também o comportamento do cartão.</p></div>
+        <div className="corpo">
+          <div className={l.ablacao}>
+            <div><div className="legenda">A: só a transação</div><div className="cifra l">{A.AP.toFixed(3)}</div></div>
+            <div className={l.ablacaoBarra} aria-hidden><span style={{ left: `${A.AP * 100}%`, width: `${(B.AP - A.AP) * 100}%` }} /><i style={{ left: `${A.AP * 100}%` }} /><i style={{ left: `${B.AP * 100}%` }} /></div>
+            <div><div className="legenda">B: com histórico</div><div className="cifra l protecao">{B.AP.toFixed(3)}</div></div>
+          </div>
+          <p className="nota">AP de 0 a 1. Recall a 1% de falso positivo: {fmt.pct(A.recall_fpr_1pct)} contra {fmt.pct(B.recall_fpr_1pct)}.</p>
+        </div>
+      </section>
+
+      <section className="bloco">
+        <div className="lado"><h2>Teste de estresse</h2><p>Na Sparkov, nenhuma fraude passa de US$ 1.376 e as fraudes vêm em rajada no mesmo cartão. Retirar esses atalhos mostra quanto o resultado depende do gerador sintético.</p></div>
+        <div className="corpo tabela-rolar">
+          <table>
+            <thead><tr><th>Experimento</th><th>O que muda</th><th className="n">AP no teste</th><th className="n">Recall a 1% FPR</th></tr></thead>
+            <tbody>{estresse.map(([k, d, m], i) => (
+              <tr key={k} className={i === 0 ? "destaque" : ""}><td>{k}</td><td>{d}</td>
+                <td className="n mono"><span className={l.ap}><i style={{ width: `${m.AP * 64}px`, background: m.AP < 0.6 ? "var(--risco)" : undefined }} />{m.AP.toFixed(4)}</span></td>
+                <td className="n">{fmt.pct(m.recall_fpr_1pct)}</td></tr>
+            ))}</tbody>
+          </table>
+          <p className="nota">Leitura: o sinal está concentrado em valor e em rajadas, muito mais nítido que em dados reais. A AP de {ch.AP.toFixed(3)} é um teto otimista, não uma promessa para um banco.</p>
+        </div>
+      </section>
+
+      <section className="bloco">
+        <div className="lado"><h2>Calibração</h2><p>O score bruto ordena bem, mas exagera a probabilidade por causa do peso dado às fraudes no treino. O calibrador corrige isso numa janela própria.</p></div>
+        <div className={`corpo ${l.duas}`}>
+          <Grafico altura={280} data={[
+            { type: "scatter", mode: "lines+markers", name: "bruto", x: c.calibracao.bruto.previsto, y: c.calibracao.bruto.observado, line: { color: "#7D8A9C" }, marker: { size: 5 } },
+            { type: "scatter", mode: "lines+markers", name: `calibrado (${r.calibracao.escolhida})`, x: c.calibracao.calibrado.previsto, y: c.calibracao.calibrado.observado, line: { color: COR.protecao }, marker: { size: 5 } },
+            { type: "scatter", mode: "lines", name: "perfeito", x: [1e-5, 1], y: [1e-5, 1], line: { dash: "dot", color: "#3A4B61" } },
+          ]} layout={{ margin: { l: 48, r: 8, t: 8, b: 40 }, xaxis: { type: "log", title: { text: "probabilidade prevista" } }, yaxis: { type: "log", title: { text: "fraude observada" } } }} />
+          <div className="metricas" style={{ alignContent: "start" }}>
+            <div><div className="rot">Brier bruto</div><div className="cifra m mono">{r.calibracao.brier_teste.bruto.toFixed(6)}</div></div>
+            <div><div className="rot">Brier calibrado</div><div className="cifra m mono protecao">{r.calibracao.brier_teste.calibrado.toFixed(6)}</div><div className="legenda">{r.calibracao.escolhida}, escolhido na janela policy</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bloco">
+        <div className="lado"><h2>O que mais pesa</h2><p>Média do valor absoluto do SHAP, em log-odds do modelo bruto. Explica o modelo, não a causa da fraude.</p></div>
+        <div className="corpo">
+          <Grafico altura={360} data={[{ type: "bar", orientation: "h", x: shap.map(([, v]) => v), y: shap.map(([k]) => DESC[k] || k.replace("cat_", "categoria: ")), marker: { color: COR.intel }, hovertemplate: "%{y}: %{x:.3f}<extra></extra>" }]}
+            layout={{ margin: { l: 160, r: 10, t: 8, b: 40 }, bargap: 0.35, xaxis: { title: { text: "média |SHAP| (log-odds)" } } }} />
+        </div>
+      </section>
+
+      <section className="bloco">
+        <div className="lado"><h2>Por segmento</h2><p>Política congelada aplicada ao teste, aberta por faixa de valor, tamanho do histórico e categoria.</p></div>
+        <div className="corpo tabela-rolar" style={{ maxHeight: 380, overflowY: "auto" }}>
+          <table>
             <thead><tr><th>Segmento</th><th className="n">Transações</th><th className="n">Fraudes</th><th className="n">AP</th><th className="n">Fraudes sinalizadas</th></tr></thead>
-            <tbody>{["faixa_valor", "historico", "categoria"].flatMap((s) => Object.entries<any>(r.segmentos_teste[s]).map(([g, v]) => (
-              <tr key={s + g}><td>{s === "faixa_valor" ? `US$ ${g}` : g}</td><td className="n">{fmt.num(v.n)}</td><td className="n">{fmt.num(v.fraudes)}</td><td className="n mono">{v.AP == null ? "N/D" : v.AP.toFixed(3)}</td><td className="n">{fmt.pct(v.recall_sinalizado)}</td></tr>
-            )))}</tbody></table></div>
+            {["faixa_valor", "historico", "categoria"].map((sg) => (
+              <tbody key={sg}>
+                <tr className={l.grupo}><td colSpan={5}>{sg === "faixa_valor" ? "Faixa de valor" : sg === "historico" ? "Tamanho do histórico" : "Categoria"}</td></tr>
+                {Object.entries<any>(r.segmentos_teste[sg]).map(([g, v]) => (
+                  <tr key={sg + g}><td>{sg === "faixa_valor" ? `US$ ${g}` : g}</td><td className="n">{fmt.num(v.n)}</td><td className="n">{fmt.num(v.fraudes)}</td><td className="n mono">{v.AP == null ? "N/D" : v.AP.toFixed(3)}</td><td className="n">{fmt.pct(v.recall_sinalizado)}</td></tr>
+                ))}
+              </tbody>
+            ))}
+          </table>
         </div>
-      </div>
+      </section>
 
       {q && (
-        <div className="secao card">
-          <h2>Qualidade dos dados (Silver, BigQuery)</h2>
-          <div className="grade g4">{Object.entries<string>(q).map(([k, v]) => <div key={k}><div className="nota">{k.replaceAll("_", " ")}</div><b className="mono">{v}</b></div>)}</div>
-        </div>
+        <section className="bloco">
+          <div className="lado"><h2>Qualidade dos dados</h2><p>Checagens da camada Silver no BigQuery.</p></div>
+          <dl className={`corpo ${l.qualidade}`}>{Object.entries<string>(q).map(([k, v]) => <div key={k}><dt>{k.replaceAll("_", " ")}</dt><dd className="mono">{v}</dd></div>)}</dl>
+        </section>
       )}
 
-      <div className="secao card">
-        <h2>Limitações</h2>
-        <ul>
+      <section className="bloco">
+        <div className="lado"><h2>Limitações</h2><p>O que este resultado não prova.</p></div>
+        <ul className={`corpo ${l.limites}`}>
           <li>Dados sintéticos: o gerador tem atalhos (teto de valor das fraudes, rajadas por cartão, horário noturno). Métricas tão altas não se transferem para um banco real.</li>
           <li>Sem dispositivo, IP, destinatário, saldo ou Pix: essas features não existem na base e não foram inventadas.</li>
           <li>Custos e eficácias da política são premissas; num banco viriam de dados internos.</li>
-          <li>Fuso horário não informado na base; hora usada como está.</li>
-          <li>Rótulo atrasado só é simulado no replay (a base não traz data de confirmação).</li>
+          <li>Fuso horário não informado na base; a hora é usada como está.</li>
+          <li>Rótulo atrasado só é simulado no replay; a base não traz data de confirmação.</li>
         </ul>
-      </div>
+      </section>
     </>
   );
 }
