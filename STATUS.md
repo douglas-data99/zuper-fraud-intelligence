@@ -9,7 +9,7 @@
 | Código | https://github.com/douglas-data99/zuper-fraud-intelligence |
 | Estudo BAF | https://github.com/douglas-data99/deteccao-fraude-abertura-de-contas |
 | Portfólio | https://zuperdata.com.br/douglas-portifolio · código em https://github.com/douglas-data99/portfolio |
-| Vídeo explicativo | `video/_build/zuper-fraud-intelligence-apresentacao.mp4` (local) |
+| Vídeo explicativo | https://github.com/douglas-data99/zuper-fraud-intelligence/releases/tag/v1.0 · cópia em `Vídeos/Zuper/Zuper Fraud Intelligence/` |
 
 ## O que está pronto (implementado e testado)
 

@@ -154,3 +154,17 @@ Registro contínuo de etapas, decisões, dúvidas e dificuldades. Ele serve de b
 - **Portfólio:** https://zuperdata.com.br/douglas-portifolio, com os 2 projetos de fraude cadastrados.
   - Antes do deploy, conferi que a pasta local `zuperdata_site` era idêntica ao site no ar (hash dos arquivos e redirect do /admin). Assim, o deploy só acrescentou o portfólio.
   - **A pasta `zuperdata_site/douglas-portifolio/` não foi commitada no repositório SITES:** fica para o Douglas.
+
+### E7: vídeo (concluído)
+- **Roteiro:** 14 cenas, cerca de 650 palavras.
+- **Narração:** voz "Douglas profissional" (ElevenLabs `eleven_v4`), com corte seco nas pontas e **sem acelerar a voz**. Conferida por transcrição (faster-whisper): os números saíram corretos.
+- **Imagem:** página HTML animada (`video/video.html`). Prints reais da aplicação e do MLflow, elementos que entram na palavra falada, speed ramp com desfoque nas trocas de cena, câmera lenta nas capturas e legenda.
+- **Música:** instrumental gerada na ElevenLabs, com ducking sob a voz.
+- **Render:** 7.644 quadros a 30 fps (playwright-core), montagem no ffmpeg.
+- **Resultado:** 4 min 15 s, 1920×1080, -16,9 LUFS.
+- **Publicado como asset da release v1.0** no GitHub (61 MB, fora do histórico do git). Cópia em `Vídeos/Zuper/Zuper Fraud Intelligence/`.
+
+### Estado final da noite (≈ 07:00)
+- Tudo no ar e testado (41/41). Revisões E1 a E5 aprovadas.
+- **Pendências do Douglas:** listadas no `STATUS.md` (DNS, chave órfã, commit no SITES, noindex, recarregar cenários antes da entrevista).
+- **Relatório para o ChatGPT:** `docs/RELATORIO-PARA-REVISAO.md`.
