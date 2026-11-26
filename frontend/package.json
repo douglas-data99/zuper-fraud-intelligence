@@ -9,10 +9,10 @@
     "start": "next start -p 3000"
   },
   "dependencies": {
-    "next": "15.3.3",
+    "next": "15.5.29",
+    "plotly.js-dist-min": "2.35.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "plotly.js-dist-min": "2.35.3",
     "react-plotly.js": "2.6.0"
   },
   "devDependencies": {

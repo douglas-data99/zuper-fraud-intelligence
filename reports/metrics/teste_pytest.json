@@ -1,22 +1,22 @@
 {
-  "data": "2026-11-26 05:45:35",
+  "data": "2026-11-26 06:17:41",
   "python": "3.11.9",
   "comando": "-m pytest tests -v -p no:cacheprovider --junitxml=C:\\Users\\Douglas\\Documents\\SITES\\projetos-dados\\zuper-fraud-intelligence\\reports\\test_results\\junit.xml",
   "exit_code": 0,
-  "duracao_s": 57.8,
-  "passaram": 36,
+  "duracao_s": 74.1,
+  "passaram": 41,
   "falharam": 0,
   "pulados": 0,
   "casos": [
     {
       "nome": "test_api_stream::test_health",
       "resultado": "passou",
-      "segundos": 3.226
+      "segundos": 3.337
     },
     {
       "nome": "test_api_stream::test_score_valido_sem_escrita",
       "resultado": "passou",
-      "segundos": 0.078
+      "segundos": 0.073
     },
     {
       "nome": "test_api_stream::test_entrada_invalida_422[ruim0]",
@@ -31,12 +31,12 @@
     {
       "nome": "test_api_stream::test_entrada_invalida_422[ruim2]",
       "resultado": "passou",
-      "segundos": 0.006
+      "segundos": 0.005
     },
     {
       "nome": "test_api_stream::test_entrada_invalida_422[ruim3]",
       "resultado": "passou",
-      "segundos": 0.006
+      "segundos": 0.005
     },
     {
       "nome": "test_api_stream::test_entrada_invalida_422[ruim4]",
@@ -51,12 +51,12 @@
     {
       "nome": "test_api_stream::test_transacao_exige_id_e_e_idempotente",
       "resultado": "passou",
-      "segundos": 0.081
+      "segundos": 0.076
     },
     {
       "nome": "test_api_stream::test_stream_worker_ack_e_atualizacao_do_perfil",
       "resultado": "passou",
-      "segundos": 0.67
+      "segundos": 0.603
     },
     {
       "nome": "test_api_stream::test_recuperacao_apos_falha_do_worker",
@@ -66,7 +66,7 @@
     {
       "nome": "test_api_stream::test_falha_de_dependencia_e_explicita",
       "resultado": "passou",
-      "segundos": 4.023
+      "segundos": 4.034
     },
     {
       "nome": "test_api_stream::test_endpoints_protegidos",
@@ -76,42 +76,67 @@
     {
       "nome": "test_api_stream::test_psi_detecta_perturbacao_controlada",
       "resultado": "passou",
-      "segundos": 0.003
+      "segundos": 0.016
     },
     {
       "nome": "test_api_stream::test_recall_nao_publicado_antes_da_maturacao",
       "resultado": "passou",
-      "segundos": 0.013
+      "segundos": 0.019
+    },
+    {
+      "nome": "test_api_stream::test_rate_limit_nao_confia_no_ip_forjado",
+      "resultado": "passou",
+      "segundos": 0.043
+    },
+    {
+      "nome": "test_api_stream::test_campo_extra_rejeitado",
+      "resultado": "passou",
+      "segundos": 0.007
+    },
+    {
+      "nome": "test_api_stream::test_mensagem_envenenada_vai_para_dlq",
+      "resultado": "passou",
+      "segundos": 0.01
+    },
+    {
+      "nome": "test_api_stream::test_marcador_de_aplicacao_e_atomico",
+      "resultado": "passou",
+      "segundos": 0.032
+    },
+    {
+      "nome": "test_api_stream::test_redis_fora_do_ar_da_503_em_todo_endpoint",
+      "resultado": "passou",
+      "segundos": 16.104
     },
     {
       "nome": "test_dados_modelo::test_split_temporal_sem_sobreposicao",
       "resultado": "passou",
-      "segundos": 1.395
+      "segundos": 1.496
     },
     {
       "nome": "test_dados_modelo::test_paridade_offline_online",
       "resultado": "passou",
-      "segundos": 2.517
+      "segundos": 2.801
     },
     {
       "nome": "test_dados_modelo::test_bundle_round_trip_reproduz_metrica",
       "resultado": "passou",
-      "segundos": 28.333
+      "segundos": 28.323
     },
     {
       "nome": "test_dados_modelo::test_calibrador_valido_e_monotono",
       "resultado": "passou",
-      "segundos": 0.751
+      "segundos": 0.716
     },
     {
       "nome": "test_dados_modelo::test_shadow_nunca_muda_a_decisao",
       "resultado": "passou",
-      "segundos": 11.696
+      "segundos": 11.537
     },
     {
       "nome": "test_dados_modelo::test_contribuicoes_somam_o_log_odds",
       "resultado": "passou",
-      "segundos": 1.964
+      "segundos": 1.804
     },
     {
       "nome": "test_decisao_custos::test_bordas_exatas",
@@ -126,7 +151,7 @@
     {
       "nome": "test_decisao_custos::test_custo_calculado_a_mao",
       "resultado": "passou",
-      "segundos": 0.001
+      "segundos": 0.0
     },
     {
       "nome": "test_decisao_custos::test_otimizador_igual_forca_bruta",
@@ -146,17 +171,17 @@
     {
       "nome": "test_decisao_custos::test_grade_enxerga_a_cauda",
       "resultado": "passou",
-      "segundos": 0.011
+      "segundos": 0.012
     },
     {
       "nome": "test_features::test_cold_start_explicito",
       "resultado": "passou",
-      "segundos": 0.001
+      "segundos": 0.0
     },
     {
       "nome": "test_features::test_janela_exclui_a_propria_e_o_mesmo_segundo",
       "resultado": "passou",
-      "segundos": 0.001
+      "segundos": 0.0
     },
     {
       "nome": "test_features::test_evento_futuro_nao_altera_feature_passada",
@@ -166,7 +191,7 @@
     {
       "nome": "test_features::test_limites_inclusivos_da_janela",
       "resultado": "passou",
-      "segundos": 0.001
+      "segundos": 0.0
     },
     {
       "nome": "test_features::test_rotulo_nunca_e_feature",
@@ -181,12 +206,12 @@
     {
       "nome": "test_seguranca::test_nenhum_segredo_em_arquivo_versionavel",
       "resultado": "passou",
-      "segundos": 0.06
+      "segundos": 0.079
     },
     {
       "nome": "test_seguranca::test_nenhum_dado_pessoal_na_interface",
       "resultado": "passou",
-      "segundos": 0.001
+      "segundos": 0.006
     }
   ]
 }

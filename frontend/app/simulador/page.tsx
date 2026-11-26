@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Acao } from "@/components/Kpi";
 import { api, fmt, ROTULO_ACAO } from "@/lib/api";
 
@@ -28,6 +28,8 @@ export default function Simulador() {
   const [carregando, setCarregando] = useState(false);
   const [status, setStatus] = useState<any>(null);
   const [confirmado, setConfirmado] = useState(false);
+  const pendente = useRef<Cenario | null>(null);   // cenário escolhido aguardando o perfil carregar
+  const cardAtual = useRef<string>("");            // evita mostrar o histórico de um cartão no painel de outro
 
   useEffect(() => {
     Promise.all([api<Cartao[]>("/profiles?limite=60"), api<Cenario[]>("/scenarios"), api<Loja[]>("/merchants")])
@@ -37,10 +39,21 @@ export default function Simulador() {
 
   useEffect(() => {
     if (!card) return;
+    cardAtual.current = card;
     setPerfil(null);
+    setHist([]);
+    setResp(null);
+    setStatus(null);
     api<any>(`/profiles/${card}`).then((p) => {
+      if (p.card_key !== cardAtual.current) return;
       setPerfil(p);
-      setForm((f) => ({ ...f, merchant: p.lojas_sugeridas?.[0] || f.merchant, amount_usd: Math.round((p.ultimos_30d.media || 50) * 100) / 100 }));
+      const c = pendente.current;
+      if (c && c.card_key === card) {
+        setForm({ merchant: c.merchant, amount_usd: c.amount_usd, hora: c.hora, local: c.local });
+        pendente.current = null;
+      } else {
+        setForm((f) => ({ ...f, merchant: p.lojas_sugeridas?.[0] || f.merchant, amount_usd: Math.round((p.ultimos_30d.media || 50) * 100) / 100 }));
+      }
     }).catch((e) => setErro(e.message));
   }, [card]);
 
@@ -48,6 +61,12 @@ export default function Simulador() {
     const sug = new Set(perfil?.lojas_sugeridas || []);
     return [...lojas].sort((a, b) => Number(sug.has(b.merchant)) - Number(sug.has(a.merchant)) || a.categoria.localeCompare(b.categoria));
   }, [lojas, perfil]);
+
+  const opcoesCartao = useMemo(() => {
+    const extras = cenarios.filter((c) => !cartoes.some((k) => k.card_key === c.card_key))
+      .map((c) => ({ card_key: c.card_key, historico_total: 0, ultimos_30d: 0, categoria_mais_comum: `cenário ${NOME_CEN[c.tipo]}`, ticket_medio_historico: 0 }));
+    return [...extras, ...cartoes];
+  }, [cartoes, cenarios]);
 
   async function enviar(gravar: boolean) {
     setCarregando(true); setErro(null); setStatus(null); setConfirmado(false);
@@ -70,15 +89,21 @@ export default function Simulador() {
         setStatus(s);
         if ((s.event_status_atual || "").startsWith("persist") || (s.event_status_atual || "").startsWith("processado") || n > 20) {
           clearInterval(t);
-          if (card) api<any>(`/profiles/${card}`).then(setPerfil).catch(() => {});
+          const alvo = cardAtual.current;
+          api<any>(`/profiles/${alvo}`).then((p) => { if (p.card_key === cardAtual.current) setPerfil(p); }).catch(() => {});
         }
       } catch { if (n > 20) clearInterval(t); }
     }, 1500);
   }
 
   function aplicarCenario(c: Cenario) {
-    setCard(c.card_key);
-    setTimeout(() => setForm({ merchant: c.merchant, amount_usd: c.amount_usd, hora: c.hora, local: c.local }), 400);
+    setResp(null);
+    if (c.card_key === card && perfil) {
+      setForm({ merchant: c.merchant, amount_usd: c.amount_usd, hora: c.hora, local: c.local });
+    } else {
+      pendente.current = c;
+      setCard(c.card_key);
+    }
   }
 
   return (
@@ -118,7 +143,7 @@ export default function Simulador() {
             <div>
               <label htmlFor="card">Cliente / cartão</label>
               <select id="card" value={card} onChange={(e) => setCard(e.target.value)}>
-                {cartoes.map((c) => <option key={c.card_key} value={c.card_key}>{c.card_key.slice(0, 8)}… · {c.ultimos_30d} compras/30d · {c.categoria_mais_comum}</option>)}
+                {opcoesCartao.map((c) => <option key={c.card_key} value={c.card_key}>{c.card_key.slice(0, 8)}… · {c.ultimos_30d ? `${c.ultimos_30d} compras/30d · ` : ""}{c.categoria_mais_comum}</option>)}
               </select>
             </div>
             <div>
@@ -143,7 +168,7 @@ export default function Simulador() {
               <div className="card" style={{ background: "#0d131c" }}>
                 <Acao a={resp.decision} />
                 <div className="nota">{resp.modo}</div>
-                {resp.decision === "autenticar" && resp.modo === "transacao" && (
+                {resp.decision === "autenticar" && resp.modo === "transação" && (
                   <button style={{ marginTop: 8, width: "100%" }} onClick={() => setConfirmado(true)} disabled={confirmado}>
                     {confirmado ? "Confirmado (simulação)" : "Confirmar no app (confirmação fictícia)"}
                   </button>
@@ -207,7 +232,7 @@ export default function Simulador() {
                 <h3 style={{ marginTop: 14 }}>Trilha de processamento (tempos reais)</h3>
                 <ul className="trilha">
                   {resp.trilha.map((t: any) => <li key={t.etapa}><span className="ponto" /><span>{t.etapa}</span><span className="mono">{t.ms.toFixed(2)} ms</span></li>)}
-                  {resp.modo === "transacao" && (
+                  {resp.modo === "transação" && (
                     <li><span className={`ponto ${status?.persistencia ? "" : "pend"}`} /><span>persistência (worker → BigQuery)</span>
                       <span className="mono">{status?.persistencia ? `${status.persistencia.atraso_s}s · ${status.persistencia.destino}` : "pendente…"}</span></li>
                   )}
@@ -219,11 +244,11 @@ export default function Simulador() {
           {hist.length > 1 && (
             <div className="card">
               <h2>Comparação de cenários (contrafactual, não causal)</h2>
-              <p className="nota">Mesmo cliente, variações da compra. Mostra como o score responde; não prova causa.</p>
+              <p className="nota">Mesmo cliente (a lista zera ao trocar de cartão), variações da compra. Mostra como o score responde; não prova causa.</p>
               <div className="tabela-rolar"><table>
                 <thead><tr><th>Modo</th><th>Loja</th><th className="n">Valor</th><th className="n">Hora</th><th>Local</th><th className="n">Score</th><th>Decisão</th></tr></thead>
                 <tbody>{hist.map((h, i) => (
-                  <tr key={i}><td>{h.modo === "transacao" ? "transação" : "what-if"}</td><td>{h.entrada.merchant}</td><td className="n">{fmt.usd(h.entrada.amount_usd, 2)}</td>
+                  <tr key={i}><td>{h.modo === "transação" ? "transação" : "what-if"}</td><td>{h.entrada.merchant}</td><td className="n">{fmt.usd(h.entrada.amount_usd, 2)}</td>
                     <td className="n">{h.entrada.hora}h</td><td>{LOCAIS[h.entrada.local]}</td><td className="n mono">{h.calibrated_score.toFixed(4)}</td><td><Acao a={h.decision} /></td></tr>
                 ))}</tbody>
               </table></div>

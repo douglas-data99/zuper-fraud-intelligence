@@ -19,6 +19,6 @@ test:        ## testes (Redis de teste: docker run -d -p 127.0.0.1:6390:6379 red
 up:          ## sobe Redis + API + worker + replay + MLflow (docker compose)
 	docker compose up -d --build
 load:        ## carrega o snapshot no Redis do compose
-	docker compose exec api python -m app.loader /app/serving --redis redis://redis:6379/0
+	docker compose run --rm loader
 demo:        ## interface local
 	cd frontend && npm run sync-data && npm run dev

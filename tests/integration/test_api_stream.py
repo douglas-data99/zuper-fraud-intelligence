@@ -172,3 +172,64 @@ def test_recall_nao_publicado_antes_da_maturacao(ambiente):
     atualizar_monitoramento(st, ref, {"score": [0.1] * 10}, ["aprovar"], relogio=1000 + 30 * 86400, cursor=2, total=10, deriva=1.0)
     mon = json.loads(r.get("fraud:monitoring"))
     assert mon["desempenho_safra_madura"]["recall"] == 1.0 and mon["rotulos"]["maduros"] == 1
+
+
+def test_rate_limit_nao_confia_no_ip_forjado(ambiente):
+    """Trocar o primeiro IP do X-Forwarded-For não escapa do limite: vale o IP que o proxy acrescentou (o último)."""
+    c, r, perfis, merchants = ambiente
+    from app import main
+    limite_original = main.LIMITE_MIN
+    main.LIMITE_MIN = 3
+    try:
+        codigos = [c.get("/profiles?limite=1", headers={"X-Forwarded-For": f"9.9.9.{i}, 203.0.113.7"}).status_code for i in range(6)]
+        assert codigos.count(429) >= 3
+    finally:
+        main.LIMITE_MIN = limite_original
+
+
+def test_campo_extra_rejeitado(ambiente):
+    """O navegador não pode mandar histórico: campo não previsto dá 422."""
+    c, _, perfis, merchants = ambiente
+    assert c.post("/transactions/score", json=corpo(perfis, merchants, historico=[{"amount": 1}])).status_code == 422
+
+
+def test_mensagem_envenenada_vai_para_dlq(ambiente):
+    _, r, *_ = ambiente
+    from app.store import DLQ, GRUPO, STREAM, Store
+    from app.worker import Persistencia, Worker
+    os.environ["BQ_ENABLED"] = "0"
+    antes = r.xlen(DLQ) if r.exists(DLQ) else 0
+    r.xadd(STREAM, {"dados": "{isto nao e json"})
+    w = Worker(Store(URL), Persistencia(), nome="worker-dlq")
+    w.ciclo(bloquear_ms=100, forcar_flush=True)
+    assert r.xlen(DLQ) == antes + 1
+    assert r.xpending(STREAM, GRUPO)["pending"] == 0          # sem loop infinito de reentrega
+
+
+def test_marcador_de_aplicacao_e_atomico(ambiente):
+    """Reentrega depois de aplicada não soma de novo: o marcador nasce no mesmo MULTI do perfil."""
+    c, r, perfis, merchants = ambiente
+    from app.store import Store
+    from app.worker import aplicar_no_perfil
+    ck = next(iter(perfis))
+    ev = {"tx_id": "teste-atomico-0001", "card_key": ck, "decision": "aprovar",
+          "tx": {"ts": 1_700_000_000, "amount_usd": 10.0, "merchant": "X", "category": "home"}}
+    antes = json.loads(r.get(f"fraud:profile:{ck}"))["total_tx"]
+    st = Store(URL)
+    assert aplicar_no_perfil(st, ev) == "aplicada"
+    assert aplicar_no_perfil(st, ev).startswith("já aplicada")
+    assert json.loads(r.get(f"fraud:profile:{ck}"))["total_tx"] == antes + 1
+
+
+def test_redis_fora_do_ar_da_503_em_todo_endpoint():
+    from fastapi.testclient import TestClient
+    from app import main
+    from app.store import Store
+    original = main.STORE
+    main.STORE = Store("redis://127.0.0.1:1/0")
+    try:
+        c = TestClient(main.app)
+        for rota in ("/profiles", "/merchants", "/metrics", "/scenarios"):
+            assert c.get(rota).status_code == 503, rota
+    finally:
+        main.STORE = original

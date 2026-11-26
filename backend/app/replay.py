@@ -18,7 +18,7 @@ import pandas as pd
 
 from .features import calcular_online
 from .main_deps import modelo_padrao
-from .store import Store
+from .store import TTL_EVENTO, Store
 
 MATURACAO_S = 30 * 86400
 
@@ -41,6 +41,9 @@ def main():
     df = pd.read_parquet(f"{pasta}/replay.parquet")
     ref = json.load(open(os.path.join(os.environ.get("BUNDLE_DIR", "/app/bundle"), "referencia_drift.json")))
     cursor = int(st.r.get("fraud:replay:cursor") or 0)
+    # "hour" fica fora do PSI: numa janela curta de replay o relógio cobre poucas horas e o PSI acusaria drift falso
+    ref = {k: v for k, v in ref.items() if k != "hour"}
+    JANELA = 20000
     janela = {k: [] for k in ref}
     acoes = []
     print(f"replay pronto: {len(df)} eventos, cursor={cursor}", flush=True)
@@ -72,7 +75,7 @@ def main():
               "model_version": modelo.versao, "reasons": res["reasons"]["itens"], "recebido_em": time.time(), "latency_ms": round(ms, 3)}
         if st.reservar_tx(r.tx_id):
             st.publicar(ev)
-            st.r.set(f"fraud:status:{r.tx_id}", "publicado", ex=7 * 86400)
+            st.r.set(f"fraud:status:{r.tx_id}", "publicado", ex=TTL_EVENTO)
             st.registrar_latencia(ms, res["decision"], "replay")
             # rótulo guardado com liberação em D+30 virtual (o modelo não usa)
             st.r.zadd("fraud:labels:pendentes", {json.dumps({"tx_id": r.tx_id, "label": int(r.is_fraud), "valor": float(r.amount_usd),
@@ -83,8 +86,8 @@ def main():
         st.r.set("fraud:replay:cursor", cursor)
         for k in janela:
             janela[k].append(res["calibrated_score"] if k == "score" else (feat.get(k) if feat.get(k) is not None else np.nan))
-            janela[k] = janela[k][-5000:]
-        acoes = (acoes + [res["decision"]])[-5000:]
+            janela[k] = janela[k][-JANELA:]
+        acoes = (acoes + [res["decision"]])[-JANELA:]
         if cursor % 250 == 0:
             atualizar_monitoramento(st, ref, janela, acoes, int(r.ts_sec), cursor, len(df), deriva)
         time.sleep(max(0.0, 1.0 / eps - (time.perf_counter() - t0)))
@@ -92,36 +95,47 @@ def main():
 
 def atualizar_monitoramento(st, ref, janela, acoes, relogio, cursor, total, deriva):
     # libera rótulos maduros
+    # rótulos que completaram 30 dias virtuais viram contadores agregados (memória constante)
     maduros_novos = st.r.zrangebyscore("fraud:labels:pendentes", 0, relogio)
     if maduros_novos:
+        agg = {"n": 0, "fraudes": 0, "alertas": 0, "fraudes_alertadas": 0, "valor_fraude": 0.0, "valor_fraude_alertado": 0.0,
+               "challenger_fraudes_alertadas": 0}
+        for x in maduros_novos:
+            m = json.loads(x)
+            alerta = m["decisao"] != "aprovar"
+            agg["n"] += 1
+            agg["alertas"] += int(alerta)
+            if m["label"]:
+                agg["fraudes"] += 1
+                agg["valor_fraude"] += m["valor"]
+                agg["fraudes_alertadas"] += int(alerta)
+                agg["valor_fraude_alertado"] += m["valor"] * alerta
+                agg["challenger_fraudes_alertadas"] += int(m.get("challenger") not in (None, "aprovar"))
         p = st.r.pipeline()
-        for m in maduros_novos:
-            p.rpush("fraud:labels:maduros", m)
+        for k, v in agg.items():
+            (p.hincrbyfloat if isinstance(v, float) else p.hincrby)("fraud:labels:maduros_agg", k, v)
         p.zremrangebyscore("fraud:labels:pendentes", 0, relogio)
         p.execute()
-    maduros = [json.loads(x) for x in st.r.lrange("fraud:labels:maduros", 0, -1)]
+    a = {k: float(v) for k, v in (st.r.hgetall("fraud:labels:maduros_agg") or {}).items()}
+    n_mad = int(a.get("n", 0))
     pendentes = st.r.zcard("fraud:labels:pendentes")
     perf = None
-    if maduros:
-        y = np.array([m["label"] for m in maduros])
-        d = np.array([m["decisao"] != "aprovar" for m in maduros])
-        v = np.array([m["valor"] for m in maduros])
-        chal = np.array([m["challenger"] not in (None, "aprovar") for m in maduros])
-        perf = {"n_maduro": int(len(y)), "fraudes_maduras": int(y.sum()),
-                "recall": float((d & (y == 1)).sum() / max(y.sum(), 1)) if y.sum() else None,
-                "precisao": float((d & (y == 1)).sum() / max(d.sum(), 1)) if d.sum() else None,
-                "recall_valor": float(v[d & (y == 1)].sum() / max(v[y == 1].sum(), 1e-9)) if y.sum() else None,
-                "challenger_recall_hipotetico": float((chal & (y == 1)).sum() / max(y.sum(), 1)) if y.sum() else None,
-                "aviso": "métricas só da safra madura (rótulo liberado após 30 dias virtuais)"}
+    if n_mad and a.get("fraudes", 0) > 0:
+        perf = {"n_maduro": n_mad, "fraudes_maduras": int(a["fraudes"]),
+                "recall": a["fraudes_alertadas"] / a["fraudes"],
+                "precisao": a["fraudes_alertadas"] / a["alertas"] if a.get("alertas") else None,
+                "recall_valor": a["valor_fraude_alertado"] / a["valor_fraude"] if a.get("valor_fraude") else None,
+                "challenger_recall_hipotetico": a["challenger_fraudes_alertadas"] / a["fraudes"],
+                "aviso": "métricas só da safra madura (rótulo liberado após 30 dias virtuais); challenger com cortes próprios de mesma taxa de alerta"}
     drift = {k: psi(ref[k], np.array(janela[k], dtype=float)) for k in ref}
     vc = pd.Series(acoes).value_counts(normalize=True).to_dict() if acoes else {}
     mon = {"relogio_virtual": datetime.fromtimestamp(relogio, tz=timezone.utc).isoformat(), "eventos_processados": cursor,
            "total_periodo_teste": total, "deriva_simulada_valor": deriva,
            "psi": {k: (round(v, 4) if v is not None else None) for k, v in drift.items()},
            "psi_regra": "PSI < 0,1 estável; 0,1 a 0,25 atenção; > 0,25 investigar. Heurística, não prova de concept drift.",
-           "distribuicao_decisoes_ultimas_5000": {k: round(v, 4) for k, v in vc.items()},
-           "rotulos": {"maduros": len(maduros), "pendentes": int(pendentes),
-                       "cobertura": round(len(maduros) / max(len(maduros) + pendentes, 1), 4)},
+           "distribuicao_decisoes_janela": {k: round(v, 4) for k, v in vc.items()},
+           "rotulos": {"maduros": n_mad, "pendentes": int(pendentes),
+                       "cobertura": round(n_mad / max(n_mad + pendentes, 1), 4)},
            "desempenho_safra_madura": perf, "atualizado_em": time.time()}
     st.r.set("fraud:monitoring", json.dumps(mon))
     st.r.set("fraud:replay:status", json.dumps({"status": "rodando", "cursor": cursor, "total": total}))

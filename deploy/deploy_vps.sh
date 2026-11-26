@@ -18,10 +18,10 @@ tar czf - backend/Dockerfile backend/requirements.txt backend/app docker-compose
   | ssh -i "$KEY" "$VPS" "mkdir -p $DEST && tar xzf - -C $DEST && chmod 600 $DEST/.env.vps $DEST/secrets/gcp-fraud-pipeline.json && chown -R 10001 $DEST/artifacts/mlflow || true"
 
 echo "== subindo contêineres (limites de memória no compose)"
-ssh -i "$KEY" "$VPS" "cd $DEST && docker compose up -d --build && docker compose ps"
+ssh -i "$KEY" "$VPS" "cd $DEST && docker compose up -d --build --remove-orphans && docker compose ps"
 
 echo "== carregando snapshot no Redis"
-ssh -i "$KEY" "$VPS" "cd $DEST && docker compose exec -T api python -m app.loader /app/serving --redis redis://redis:6379/0"
+ssh -i "$KEY" "$VPS" "cd $DEST && docker compose run --rm loader"
 
 echo "== Caddy: bloco novo (backup antes), validação e reload"
 ssh -i "$KEY" "$VPS" "set -e; F=/opt/evolution/Caddyfile; cp \$F \$F.bak-\$(date +%Y%m%d%H%M%S);

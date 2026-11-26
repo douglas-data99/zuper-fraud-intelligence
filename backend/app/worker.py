@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 import redis
 
 from .features import atualizar_perfil
-from .store import GRUPO, STREAM, Store, k_perfil
+from .store import DLQ, GRUPO, STREAM, TTL_EVENTO, Store, k_perfil
 
 LOTE = int(os.environ.get("WORKER_BATCH", "200"))
 INTERVALO_BQ_S = float(os.environ.get("BQ_FLUSH_S", "15"))
@@ -58,15 +58,29 @@ class Persistencia:
         return {"linhas": len(eventos), "segundos": round(time.time() - t0, 2), "destino": "BigQuery" if self.ativo else "desativado"}
 
 
+def k_aplicada(tx_id):
+    return f"fraud:applied:{tx_id}"
+
+
 def aplicar_no_perfil(store: Store, e: dict):
+    """Aplica a transação no histórico do cartão. O marcador 'aplicada' é gravado na MESMA transação MULTI
+    do perfil: ou os dois acontecem, ou nenhum (sem update perdido se o worker cair no meio)."""
+    if store.r.exists(k_aplicada(e["tx_id"])):
+        return "já aplicada (reentrega)"
     if e["decision"] == "investigar":
-        store.r.incr("fraud:tentativas_retidas")
+        p = store.r.pipeline()
+        p.set(k_aplicada(e["tx_id"]), "retida", ex=TTL_EVENTO)
+        p.incr("fraud:tentativas_retidas")
+        p.execute()
         return "retida (fora do histórico)"
     chave = k_perfil(e["card_key"])
     for _ in range(5):
         with store.r.pipeline() as p:
             try:
-                p.watch(chave)
+                p.watch(chave, k_aplicada(e["tx_id"]))
+                if p.exists(k_aplicada(e["tx_id"])):
+                    p.unwatch()
+                    return "já aplicada (reentrega)"
                 perfil, extra = store.perfil(e["card_key"])
                 if perfil is None:
                     p.unwatch()
@@ -76,6 +90,7 @@ def aplicar_no_perfil(store: Store, e: dict):
                 extra["atualizado_em"] = time.time()
                 p.multi()
                 p.set(chave, Store.serializar(perfil, extra))
+                p.set(k_aplicada(e["tx_id"]), "aplicada", ex=TTL_EVENTO)
                 p.execute()
                 return "aplicada"
             except redis.WatchError:
@@ -104,22 +119,20 @@ class Worker:
         novas = store.r.xreadgroup(GRUPO, self.nome, {STREAM: ">"}, count=LOTE, block=bloquear_ms) or []
         msgs = list(orfas) + [m for _, lote in novas for m in lote]
         for msg_id, campos in msgs:
-            e = json.loads(campos["dados"])
             if msg_id in self.ids:
                 continue  # já está no lote em memória aguardando o BigQuery
-            if not store.r.sadd("fraud:persisted_ids", e["tx_id"]):
-                # perfil já aplicado antes (reentrega ou retry): não reaplica; só garante a persistência
+            try:
+                e = json.loads(campos["dados"])
                 if (store.r.get(f"fraud:status:{e['tx_id']}") or "").startswith(("persistido", "processado")):
-                    store.r.xack(STREAM, GRUPO, msg_id)
+                    store.r.xack(STREAM, GRUPO, msg_id)   # já persistido antes: reentrega
                     continue
-                e["perfil"] = "já aplicada (reentrega)"
-            else:
-                try:
-                    e["perfil"] = aplicar_no_perfil(store, e)
-                except Exception as exc:
-                    store.r.srem("fraud:persisted_ids", e["tx_id"])
-                    print("erro perfil", exc, flush=True)
-                    continue
+                e["perfil"] = aplicar_no_perfil(store, e)
+            except Exception as exc:
+                # mensagem envenenada: vai para a fila de análise e sai do fluxo (sem loop infinito)
+                store.r.xadd(DLQ, {"msg_id": msg_id, "erro": str(exc)[:300], "dados": str(campos.get("dados", ""))[:4000]}, maxlen=5000, approximate=True)
+                store.r.xack(STREAM, GRUPO, msg_id)
+                print("mensagem enviada à DLQ", msg_id, exc, flush=True)
+                continue
             self.buffer.append(e)
             self.ids.append(msg_id)
         if self.buffer and (forcar_flush or len(self.buffer) >= LOTE or time.time() - self.ultimo_flush >= INTERVALO_BQ_S):
@@ -134,14 +147,16 @@ class Worker:
             # sem ACK: as mensagens continuam pendentes e serão retomadas; o perfil já foi aplicado (idempotente)
             store.r.set("fraud:bq:last_sync", json.dumps({"status": "erro", "quando": time.time(), "erro": str(exc)[:200]}))
             print("erro BigQuery", exc, flush=True)
+            self.ultimo_flush = time.time()   # backoff: espera o intervalo antes de tentar de novo
             return False
         p = store.r.pipeline()
         for e, msg_id in zip(self.buffer, self.ids):
             p.xack(STREAM, GRUPO, msg_id)
-            p.set(f"fraud:status:{e['tx_id']}", "persistido" if pers.ativo else "processado (BigQuery desativado)", ex=7 * 86400)
+            p.xdel(STREAM, msg_id)          # já persistido e confirmado: libera memória do stream
+            p.set(f"fraud:status:{e['tx_id']}", "persistido" if pers.ativo else "processado (BigQuery desativado)", ex=TTL_EVENTO)
             p.set(f"fraud:persist_info:{e['tx_id']}", json.dumps({"perfil": e["perfil"], "persistido_em": time.time(),
                                                                  "atraso_s": round(time.time() - e["recebido_em"], 2),
-                                                                 "destino": info.get("destino")}), ex=7 * 86400)
+                                                                 "destino": info.get("destino")}), ex=TTL_EVENTO)
         p.set("fraud:bq:last_sync", json.dumps({"status": "ok" if pers.ativo else "desativado", "quando": time.time(), **info}))
         p.incrby("fraud:bq:linhas_total", info["linhas"])
         p.execute()

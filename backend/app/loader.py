@@ -78,7 +78,10 @@ def escolher_cenarios(st, perfis, merchants, por_cat, semente=42):
             r = modelo.pontuar(feat, com_motivos=False, shadow=False)
             esperado = {"habitual": "aprovar", "ambiguo": "autenticar", "atipico": "investigar"}[tipo]
             if r["decision"] == esperado:
-                achados[tipo] = {"tipo": tipo, "descricao": desc, "card_key": d["card_key"], "merchant": loja,
+                nova_loja = loja not in perfil.merchants_vistos
+                if tipo != "habitual":   # a descrição diz exatamente o que a transação é (loja nova ou não)
+                    desc = desc.replace("Mercado novo", "Mercado novo" if nova_loja else "Mercado já usado")                                .replace("Loja online nunca usada", "Loja online nunca usada" if nova_loja else "Loja online já usada")
+                achados[tipo] = {"tipo": tipo, "descricao": desc, "loja_nova": nova_loja, "card_key": d["card_key"], "merchant": loja,
                                  "categoria": merchants[loja]["categoria"], "amount_usd": valor, "hora": hora, "local": local,
                                  "decisao_na_selecao": r["decision"], "score_na_selecao": round(r["calibrated_score"], 4),
                                  "regra": "selecionado por what-if real sobre o snapshot; o resultado mostrado é sempre o da API"}

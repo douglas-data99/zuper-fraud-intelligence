@@ -11,14 +11,17 @@ services:
     cpus: 0.3
     restart: unless-stopped
     healthcheck: {test: ["CMD", "redis-cli", "ping"], interval: 15s, timeout: 3s, retries: 5}
-    networks: [interna]
+    # nome ÚNICO: a API também está na rede do Caddy, onde já existe outro host "redis" (o do WhatsApp).
+    # Com o nome genérico, a API resolveria o Redis errado (incidente de 26/11/2026, corrigido).
+    networks:
+      interna: {aliases: [zfi-redis]}
 
-  api:
+  zfi-api:          # nome único: este serviço também entra na rede do Caddy (compartilhada)
     build: ./backend
     image: zuper-fraud-api:1.0
     env_file: .env.vps
     environment:
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://zfi-redis:6379/0
       BUNDLE_DIR: /app/bundle
       MODEL_THREADS: "1"
     volumes:
@@ -26,12 +29,12 @@ services:
       - ./data/serving:/app/serving:ro
     ports: ["127.0.0.1:8095:8000"]
     depends_on: {redis: {condition: service_healthy}}
-    mem_limit: 450m
+    mem_limit: 500m
     cpus: 0.8
     restart: unless-stopped
     networks:
       interna: {}
-      proxy: {aliases: [zfi-api]}   # rede do Caddy existente: só a API entra nela
+      proxy: {}   # rede do Caddy existente: só a API entra nela, com o nome único zfi-api
 
   worker:
     image: zuper-fraud-api:1.0
@@ -41,11 +44,11 @@ services:
       interval: 30s
     env_file: .env.vps
     environment:
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://zfi-redis:6379/0
       GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/gcp.json
     volumes:
       - ./secrets/gcp-fraud-pipeline.json:/run/secrets/gcp.json:ro
-    depends_on: {redis: {condition: service_healthy}, api: {condition: service_started}}
+    depends_on: {redis: {condition: service_healthy}, zfi-api: {condition: service_started}}
     mem_limit: 300m
     cpus: 0.3
     restart: unless-stopped
@@ -59,14 +62,14 @@ services:
       interval: 30s
     env_file: .env.vps
     environment:
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://zfi-redis:6379/0
       BUNDLE_DIR: /app/bundle
       SERVING_DIR: /app/serving
     volumes:
       - ./artifacts/model_bundle:/app/bundle:ro
       - ./data/serving:/app/serving:ro
     depends_on: {redis: {condition: service_healthy}}
-    mem_limit: 450m
+    mem_limit: 650m
     cpus: 0.4
     restart: unless-stopped
     networks: [interna]
@@ -74,12 +77,27 @@ services:
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.22.1
     command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000",
-              "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--artifacts-destination", "/mlflow/artifacts", "--serve-artifacts"]
+              "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--artifacts-destination", "/mlflow/artifacts", "--serve-artifacts",
+              "--workers", "1"]
     volumes: [./artifacts/mlflow:/mlflow]
     ports: ["127.0.0.1:5005:5000"]      # só via túnel SSH: ssh -L 5005:127.0.0.1:5005 root@VPS
-    mem_limit: 400m
+    mem_limit: 350m
     cpus: 0.3
     restart: unless-stopped
+    networks: [interna]
+
+  loader:            # tarefa avulsa (só rede interna): docker compose run --rm loader (carrega o snapshot e escolhe os cenários)
+    image: zuper-fraud-api:1.0
+    profiles: [tarefas]
+    command: ["python", "-m", "app.loader", "/app/serving", "--redis", "redis://zfi-redis:6379/0"]
+    environment:
+      BUNDLE_DIR: /app/bundle
+    volumes:
+      - ./artifacts/model_bundle:/app/bundle:ro
+      - ./data/serving:/app/serving:ro
+    depends_on: {redis: {condition: service_healthy}}
+    mem_limit: 700m
+    cpus: 0.8
     networks: [interna]
 
 volumes:

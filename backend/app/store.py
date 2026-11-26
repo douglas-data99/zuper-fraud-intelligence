@@ -9,6 +9,9 @@ import redis
 from .features import Perfil
 
 STREAM = "fraud:transactions"
+DLQ = "fraud:transactions:dlq"   # mensagens que falharam (poison), para análise
+TTL_EVENTO = 2 * 86400           # chaves por transação expiram em 2 dias (memória do Redis é limitada)
+STREAM_MAX = 20000
 GRUPO = "persistencia"
 
 
@@ -51,13 +54,16 @@ class Store:
 
     def reservar_tx(self, tx_id: str) -> bool:
         """True se este tx_id ainda não foi processado (SET NX). Evita efeito duplicado em retry."""
-        return bool(self.r.set(f"fraud:txlock:{tx_id}", "1", nx=True, ex=7 * 86400))
+        return bool(self.r.set(f"fraud:txlock:{tx_id}", "1", nx=True, ex=TTL_EVENTO))
+
+    def liberar_tx(self, tx_id: str):
+        self.r.delete(f"fraud:txlock:{tx_id}")
 
     def guardar_resposta(self, tx_id: str, resp: dict):
-        self.r.set(f"fraud:tx:{tx_id}", json.dumps(resp, default=str), ex=7 * 86400)
+        self.r.set(f"fraud:tx:{tx_id}", json.dumps(resp, default=str), ex=TTL_EVENTO)
 
     def publicar(self, evento: dict) -> str:
-        return self.r.xadd(STREAM, {"dados": json.dumps(evento, default=str)}, maxlen=200000, approximate=True)
+        return self.r.xadd(STREAM, {"dados": json.dumps(evento, default=str)}, maxlen=STREAM_MAX, approximate=True)
 
     def status_evento(self, tx_id: str) -> str | None:
         return self.r.get(f"fraud:status:{tx_id}")

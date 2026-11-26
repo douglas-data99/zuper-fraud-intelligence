@@ -49,6 +49,11 @@ class Modelo:
                 self.challenger[-1].set_params(n_jobs=1)
             except Exception:
                 pass
+        pc = pasta / "politica_challenger.json"
+        self.politica_challenger = None
+        if pc.exists():
+            d = json.loads(pc.read_text(encoding="utf-8"))
+            self.politica_challenger = Politica(d["t_auth"], d["t_review"], "challenger-mesma-taxa-de-alerta")
         met = pasta / "metricas_teste.json"
         self.metricas = json.loads(met.read_text(encoding="utf-8")) if met.exists() else {}
         self.versao = f"xgb-{self.schema.get('treinado_em', '?').replace(' ', 'T')}"
@@ -68,13 +73,18 @@ class Modelo:
         t0 = time.perf_counter()
         X = vetorizar(pd.DataFrame([feat]), "B")
         dm = xgb.DMatrix(X)
-        bruto = float(self.booster.predict(dm, iteration_range=self.faixa)[0])
+        contrib = None
+        if com_motivos:
+            # uma passada só: as contribuições SHAP somam exatamente o log-odds do modelo (teste de integração confere)
+            contrib = self.booster.predict(dm, pred_contribs=True, iteration_range=self.faixa)[0]
+            bruto = float(1.0 / (1.0 + np.exp(-float(contrib.sum()))))
+        else:
+            bruto = float(self.booster.predict(dm, iteration_range=self.faixa)[0])
         calibrado = float(self.calibrar(np.array([bruto]))[0])
         decisao = self.politica.decidir(calibrado)
         t_inf = (time.perf_counter() - t0) * 1000
         out = {"raw_score": bruto, "calibrated_score": calibrado, "decision": decisao, "inferencia_ms": round(t_inf, 3)}
         if com_motivos:
-            contrib = self.booster.predict(dm, pred_contribs=True, iteration_range=self.faixa)[0]
             base, vals = float(contrib[-1]), contrib[:-1]
             pares = sorted(zip(self.colunas, vals, X.iloc[0].values), key=lambda x: -abs(x[1]))
             motivos = []
@@ -92,7 +102,7 @@ class Modelo:
             t1 = time.perf_counter()
             s_ch = float(self.challenger.predict_proba(X)[:, 1][0])
             out["shadow"] = {"modelo": self.schema.get("challenger"), "score": s_ch,
-                             "decisao_hipotetica": self.politica.decidir(s_ch),
-                             "observacao": "score do challenger não calibrado; ação hipotética, nunca aplicada",
+                             "decisao_hipotetica": (self.politica_challenger or self.politica).decidir(s_ch),
+                             "observacao": "cortes próprios do challenger (mesma taxa de alerta do Champion na janela policy); ação hipotética, nunca aplicada",
                              "ms": round((time.perf_counter() - t1) * 1000, 3)}
         return out

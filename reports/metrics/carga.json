@@ -1,0 +1,15 @@
+{
+  "data": "2026-11-26 06:12",
+  "alvo": "https://zfi-api.2-29-40-32.sslip.io",
+  "requisicoes": 300,
+  "concorrencia": 4,
+  "p50_ms": 512.2,
+  "p95_ms": 732.1,
+  "p99_ms": 1051.0,
+  "interno_p50_ms": 230.5,
+  "interno_p95_ms": 442.5,
+  "rps": 7.5,
+  "taxa_erro": 0.0,
+  "condicoes": "VPS Hetzner CX23 compartilhada (2 vCPU, 3,7 GB) com WhatsApp em produção ao lado; API limitada a 0,8 vCPU, 1 worker uvicorn, 1 thread de modelo; replay rodando em paralelo; cliente no Brasil, rede pública até Helsinque, HTTPS via Caddy",
+  "aviso": "amostra pequena; não indica capacidade de produção"
+}

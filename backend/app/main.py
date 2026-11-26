@@ -16,11 +16,12 @@ import numpy as np
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, field_validator
+import redis as redis_lib
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .features import Perfil, calcular_online
 from .scoring import Modelo
-from .store import GRUPO, STREAM, Store, k_perfil
+from .store import GRUPO, STREAM, TTL_EVENTO, Store, k_perfil
 
 BUNDLE = os.environ.get("BUNDLE_DIR", "/app/bundle")
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
@@ -40,6 +41,7 @@ INICIO = time.time()
 
 # ---------------------------------------------------------------- contratos
 class TransacaoIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")   # campo não previsto (ex.: "historico") é rejeitado com 422
     tx_id: str | None = Field(None, min_length=8, max_length=64, pattern=r"^[A-Za-z0-9\-_]+$")
     card_key: str = Field(..., min_length=16, max_length=16, pattern=r"^[0-9a-f]{16}$")
     amount_usd: float = Field(..., gt=0, le=30000)
@@ -60,7 +62,11 @@ def erro(status: int, codigo: str, msg: str):
 
 
 def limitar(request: Request):
-    ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "?").split(",")[0].strip()
+    if ADMIN_TOKEN and request.headers.get("authorization") == f"Bearer {ADMIN_TOKEN}":
+        return  # teste de carga autorizado
+    # o ÚLTIMO IP do X-Forwarded-For é o que o nosso proxy (Caddy) viu; os anteriores vêm do cliente e podem ser forjados
+    xff = request.headers.get("x-forwarded-for")
+    ip = xff.split(",")[-1].strip() if xff else (request.client.host if request.client else "?")
     try:
         ok = STORE.limitar(ip, LIMITE_MIN)
     except Exception:
@@ -72,6 +78,12 @@ def limitar(request: Request):
 def admin(authorization: str = Header("")):
     if not ADMIN_TOKEN or authorization != f"Bearer {ADMIN_TOKEN}":
         erro(401, "nao_autorizado", "endpoint protegido")
+
+
+@app.exception_handler(redis_lib.RedisError)
+async def redis_fora(request: Request, exc: Exception):
+    return JSONResponse(status_code=503, content={"detail": {"codigo": "feature_store_indisponivel",
+                                                             "mensagem": "Redis indisponível: nenhuma decisão foi tomada"}})
 
 
 @app.exception_handler(Exception)
@@ -139,7 +151,7 @@ def processar(body: TransacaoIn, gravar: bool, origem: str) -> dict:
         "features": {k: (None if v is None else (round(v, 4) if isinstance(v, float) else v)) for k, v in feat.items()},
         "reasons": res["reasons"],
         "shadow": res.get("shadow"),
-        "modo": "transacao" if gravar else "what-if (sem gravação)",
+        "modo": "transação" if gravar else "what-if (sem gravação)",
     }
     if gravar:
         if not STORE.reservar_tx(tx_id):
@@ -156,8 +168,12 @@ def processar(body: TransacaoIn, gravar: bool, origem: str) -> dict:
                   "model_version": MODELO.versao, "reasons": res["reasons"]["itens"], "recebido_em": time.time()}
         ms_ate_aqui = (time.perf_counter() - t0) * 1000
         evento["latency_ms"] = round(ms_ate_aqui, 3)
-        STORE.publicar(evento)
-        STORE.r.set(f"fraud:status:{tx_id}", "publicado", ex=7 * 86400)
+        try:
+            STORE.publicar(evento)
+        except Exception:
+            STORE.liberar_tx(tx_id)   # sem evento publicado: o mesmo tx_id pode ser reenviado
+            raise
+        STORE.r.set(f"fraud:status:{tx_id}", "publicado", ex=TTL_EVENTO)
         etapas.append({"etapa": "evento publicado (Redis Streams)", "ms": round((time.perf_counter() - t0) * 1000, 3)})
         resposta["event_status"] = "publicado; persistência no BigQuery pendente (assíncrona)"
     else:

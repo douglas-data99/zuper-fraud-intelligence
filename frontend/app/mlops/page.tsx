@@ -53,7 +53,7 @@ export default function Mlops() {
           <Caixa titulo="Next.js (Vercel)" sub="interface, 5 páginas" ok={true} />
           <Caixa titulo="FastAPI" sub="validação, features, inferência, decisão" ok={st ? st.api?.status === "ok" : null} extra={st?.api?.modelo_carregado} />
           <Caixa titulo="Redis (feature store online)" sub="perfis e lojas, lookup O(1)" ok={st ? st.redis?.status === "ok" : null} extra={st?.redis?.perfis ? `${st.redis.perfis} perfis` : undefined} />
-          <Caixa titulo="Redis Streams" sub="eventos de transação e decisão" ok={st ? st.stream != null : null} extra={st?.stream ? `${fmt.num(st.stream.tamanho)} eventos · ${st.stream.pendentes_sem_ack ?? 0} sem ACK · lag ${st.stream.lag ?? 0}` : undefined} />
+          <Caixa titulo="Redis Streams" sub="eventos de transação e decisão" ok={st ? st.stream?.pendentes_sem_ack != null : null} extra={st?.stream ? `${fmt.num(st.stream.tamanho)} no stream · ${st.stream.pendentes_sem_ack ?? "N/D"} sem ACK · lag ${st.stream.lag ?? "N/D"}` : undefined} />
           <Caixa titulo="Worker Python" sub="atualiza histórico, persiste com ACK" ok={st ? st.worker?.status === "ok" : null} extra={st?.worker?.ultimo_sinal_s != null ? `último sinal há ${st.worker.ultimo_sinal_s}s` : "sem sinal"} />
           <Caixa titulo="BigQuery" sub="Bronze → Silver → Gold, auditoria" ok={st ? st.bigquery?.status === "ok" : null} extra={st?.bigquery?.quando ? `última carga: ${st.bigquery.linhas} linhas, ${new Date(st.bigquery.quando * 1000).toLocaleTimeString("pt-BR")}` : st?.bigquery?.status} />
           <Caixa titulo="MLflow (privado)" sub="tracking + registry, só por túnel SSH" ok={null} extra="aliases: champion / challenger" />
@@ -125,7 +125,7 @@ export default function Mlops() {
           {testes ? <>
             <p><b>{testes.passaram}</b> passaram, <b>{testes.falharam}</b> falharam, <b>{testes.pulados}</b> pulados · {testes.data} · Python {testes.python} · exit code {testes.exit_code}</p>
             <div className="tabela-rolar" style={{ maxHeight: 260, overflowY: "auto" }}><table><tbody>
-              {testes.casos.map((t: any) => <tr key={t.nome}><td className="mono" style={{ fontSize: ".78rem" }}>{t.nome}</td><td className="n">{t.resultado}</td></tr>)}
+              {testes.casos.map((t: any) => <tr key={t.nome}><td className="mono" style={{ fontSize: ".74rem", wordBreak: "break-all" }}>{t.nome}</td><td className="n" style={{ whiteSpace: "nowrap" }}>{t.resultado}</td></tr>)}
             </tbody></table></div>
           </> : <div className="estado">Relatório de testes ainda não gerado.</div>}
         </div>

@@ -16,10 +16,12 @@ export default function Lab() {
   const [r, setR] = useState<any>(null);
   const [c, setC] = useState<any>(null);
   const [q, setQ] = useState<any>(null);
+  const [ing, setIng] = useState<any>(null);
   useEffect(() => {
     dado<any>("resultados.json").then(setR);
     dado<any>("curvas.json").then(setC);
     dado<any>("qualidade_silver.json").then(setQ).catch(() => setQ(null));
+    dado<any>("ingestao.json").then(setIng).catch(() => setIng(null));
   }, []);
   if (!r || !c) return <div className="estado">carregando…</div>;
   const nomes = Object.keys(r.teste);
@@ -37,7 +39,7 @@ export default function Lab() {
       </div></div>
 
       <div className="grade g4">
-        <div className="card kpi"><div className="rot">Transações</div><div className="val">1.852.394</div><div className="def">Sparkov (CC0), 2019-01 a 2020-12, 999 cartões, 693 lojas</div></div>
+        <div className="card kpi"><div className="rot">Transações</div><div className="val">{fmt.num(ing?.bronze?.linhas)}</div><div className="def">Sparkov (CC0) · {q ? `${fmt.num(Number(q.cartoes))} cartões, ${fmt.num(Number(q.merchants))} lojas` : "N/D"} · SHA-256 conferido na ingestão</div></div>
         <div className="card kpi"><div className="rot">Fraude no teste</div><div className="val">{fmt.pct(r.teste[r.champion].prevalencia, 2)}</div><div className="def">linha de base da curva PR (o acaso)</div></div>
         <div className="card kpi"><div className="rot">AP do Champion (teste)</div><div className="val">{r.teste[r.champion].AP.toFixed(3)}</div><div className="def">{r.champion}</div></div>
         <div className="card kpi"><div className="rot">Ganho do histórico (AP)</div><div className="val">+{((B.AP - A.AP) * 100).toFixed(1)} p.p.</div><div className="def">mesmas linhas de teste: {A.AP.toFixed(3)} → {B.AP.toFixed(3)}</div></div>
@@ -52,7 +54,7 @@ export default function Lab() {
             <tr key={k}><td className="mono">{k}</td><td>{({ train: "ajuste dos modelos", tuning: "early stopping, Optuna, escolha do Champion", calibration: "calibrador de probabilidade", policy: "cortes da política de custo", test: "avaliação final (intocada)" } as any)[k]}</td>
               <td>{v.inicio.slice(0, 10)}</td><td>{v.fim.slice(0, 10)}</td><td className="n">{fmt.num(v.n)}</td><td className="n">{fmt.num(v.fraudes)}</td></tr>
           ))}</tbody></table></div>
-        <p className="nota">Janeiro/2019 serve só como aquecimento do histórico. Features point-in-time: toda janela termina 1 segundo antes da transação (validado por revisor independente: 0 divergências em 722.566 valores recalculados).</p>
+        <p className="nota">Janeiro/2019 serve só como aquecimento do histórico. Features point-in-time: toda janela termina 1 segundo antes da transação (conferido por revisão independente em pandas e pelo teste automatizado de paridade offline × online).</p>
       </div>
 
       <div className="secao card">

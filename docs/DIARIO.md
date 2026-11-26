@@ -96,3 +96,15 @@ Registro contínuo de etapas, decisões, dúvidas e dificuldades. Ele serve de b
   - o teste de round-trip agora passa com tolerância de 1e-9.
 - **Outro erro, no próprio teste:** o teste de paridade dividia microssegundos como se fossem nanossegundos. Corrigido. Paridade offline × online: 0 divergências em 300 transações × 15 features.
 - **pytest:** 35 passaram, 0 falharam (evidência em `reports/test_results/`).
+
+### INCIDENTE na VPS (26/11/2026, ~08:55): a API resolveu o Redis do WhatsApp
+- **Causa:** a API está em duas redes, a interna do projeto e a `evolution_default` do Caddy, que é a mesma do WhatsApp. Na rede do Caddy já existe um host chamado `redis` (Redis da Evolution). Com `REDIS_URL=redis://redis:6379/0`, a API resolveu o Redis do WhatsApp em vez do nosso.
+- **O que pode ter sido escrito lá:**
+  - só a chave `fraud:replay:comando`, gravada 2 vezes pelo `POST /admin/replay`, com o valor `{"acao": "iniciar", "eps": 15.0, "deriva_valor": 1.0}`, sem TTL;
+  - leituras de `/architecture/status` e `/health` (não escrevem);
+  - nenhuma transação, perfil ou contador passou pela API pública nesse intervalo;
+  - o loader roda num contêiner só na rede interna e escreveu no nosso Redis.
+- **Correção:** o nosso Redis passou a ter o nome único `zfi-redis`, e todo `REDIS_URL` aponta para ele. Confirmado: o comando agora cai no nosso Redis.
+- **Pendente para o Douglas:** o classificador de segurança me impediu (corretamente) de acessar o Redis do WhatsApp para conferir e limpar. Se quiser remover a chave órfã, que é pequena e não interfere na Evolution, porque a Evolution não usa o prefixo `fraud:`:
+  `docker exec evolution-redis-1 redis-cli DEL fraud:replay:comando` (e o mesmo em `evolution-prospect-prospect-redis-1`, se existir lá).
+- **Lição:** em rede compartilhada, nunca usar nome de serviço genérico. Registrada também em `docs/architecture.md`.
