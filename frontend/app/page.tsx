@@ -235,7 +235,7 @@ export default function ComoFunciona() {
   const texto = noFoco ? (ETAPAS.find((e) => e.k === noFoco.k)?.texto ?? noFoco.papel)
     : fim ? "Uma decisão em milissegundos, dados rastreáveis para auditoria e um ciclo que mantém o modelo honesto ao longo do tempo."
     : etapaAtual ? etapaAtual.texto : "Acompanhe, em 18 etapas, como o sistema decide e o que acontece depois da decisão.";
-  const faixaAtual = noFoco ? noFoco.faixa : etapaAtual ? mapa[etapaAtual.k].faixa : null;
+  const faixaAtual = noFoco ? noFoco.faixa : !fim && etapaAtual ? mapa[etapaAtual.k].faixa : null;
   const restante = ((DURACAO - decorrido) / 1000).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const acaoVisivel = vistos.has("decision");
 

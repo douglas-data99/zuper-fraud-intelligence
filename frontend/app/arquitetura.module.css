@@ -66,14 +66,14 @@
 
 /* narração */
 .lado { position: sticky; top: 24px; display: flex; flex-direction: column; border-left: 1px solid var(--line); padding-left: 28px; max-height: calc(100vh - 48px); }
-.narracao { min-height: 200px; }
+.narracao { min-height: 200px; flex: none; }
 .faixaRot { font-size: var(--t-sm); color: var(--ink-3); margin-bottom: 10px; }
 .etapaTitulo { font-size: var(--t-xl); letter-spacing: -.03em; margin: 0 0 10px; animation: surgir var(--medio) var(--ease); }
 .etapaTexto { font-size: var(--t-md); color: var(--ink-2); line-height: 1.5; margin: 0; }
 .fimAcoes { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
 .fimAcoes :global(.btn) { justify-content: flex-start; }
 
-.progresso { display: block; width: 100%; border: 0; padding: 18px 0 16px; margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; text-align: left; }
+.progresso { flex: none; display: block; width: 100%; border: 0; padding: 18px 0 16px; margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; text-align: left; }
 .progresso:hover:not(:disabled) { background: transparent; }
 .trilhoTempo { display: block; height: 2px; background: var(--line); overflow: hidden; border-radius: 2px; }
 .trilhoTempo i { display: block; height: 100%; background: var(--zuper-forte); transform-origin: left; }
