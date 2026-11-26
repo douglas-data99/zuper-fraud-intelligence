@@ -1,0 +1,13 @@
+{
+  "transacoes_acima_maior_fraude": "2299",
+  "perfis_com_mais_de_um_endereco": "0",
+  "colisao_hash_cartao": "0",
+  "empates_mesmo_cartao_mesmo_segundo": "44",
+  "tx_id_duplicado": "0",
+  "merchants": "693",
+  "maior_valor_fraude": "1376.04",
+  "cartoes": "999",
+  "nulos_chave": "0",
+  "valor_nao_positivo": "0",
+  "linhas": "1852394"
+}

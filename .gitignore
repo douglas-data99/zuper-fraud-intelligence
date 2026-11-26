@@ -1,5 +1,5 @@
 # dados, segredos e artefatos (nunca no git)
-data/
+/data/
 secrets/
 .env
 .env.*
