@@ -52,8 +52,8 @@ async function interacoes() {
   await page.goto(DEPOIS + "/", { waitUntil: "networkidle" });
   await page.waitForTimeout(1200);
   await page.getByRole("button", { name: "Iniciar apresentação" }).click();
-  await page.waitForTimeout(3600);
-  ok("apresentação avança sozinha em 3 s", (await page.locator("[aria-live=polite]").first().innerText()).startsWith("2 de"));
+  await page.waitForTimeout(2000);
+  ok("apresentação avança sozinha em 1,5 s", (await page.locator("[aria-live=polite]").first().innerText()).startsWith("2 de"));
   await page.locator("button[aria-label^='Pausar']").first().hover();
   await page.getByRole("button", { name: /Pausar/ }).first().click();
   for (let k = 0; k < 20; k++) await page.keyboard.press("ArrowRight");

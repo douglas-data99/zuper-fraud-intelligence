@@ -69,7 +69,7 @@ const ACOES = [
   { nome: "Confirmar", cls: s.autenticar },
   { nome: "Reter", cls: s.investigar },
 ];
-const DURACAO = 3000;
+const DURACAO = 1500;
 
 function Glifo({ g }: { g: string }) {
   const d: Record<string, string> = {
@@ -329,7 +329,7 @@ export default function ComoFunciona() {
             aria-label={rodando ? "Pausar" : "Continuar"}>
             <span className={s.trilhoTempo}><i style={{ transform: `scaleX(${i < 0 ? 0 : decorrido / DURACAO})` }} /></span>
             <span className={s.tempo}>
-              <span>{pausaMouse && rodando ? "Pausado enquanto o mouse está aqui" : rodando ? "Próxima etapa em" : i < 0 ? "Três segundos por etapa" : fim ? "Apresentação concluída" : "Pausado"}</span>
+              <span>{pausaMouse && rodando ? "Pausado enquanto o mouse está aqui" : rodando ? "Próxima etapa em" : i < 0 ? "Um segundo e meio por etapa" : fim ? "Apresentação concluída" : "Pausado"}</span>
               <span className="mono">{rodando ? `${restante} s` : ""}</span>
             </span>
           </button>

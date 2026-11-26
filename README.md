@@ -15,7 +15,7 @@
 
 ## Interface
 
-A tela inicial apresenta a arquitetura em três faixas: operação em tempo real, dados e MLOps, decisão e impacto. Ela avança etapa por etapa, com 3 s por etapa, pausa com o mouse e navegação manual.
+A tela inicial apresenta a arquitetura em três faixas: operação em tempo real, dados e MLOps, decisão e impacto. Ela avança etapa por etapa, com 1,5 s por etapa, pausa com o mouse e navegação manual.
 
 Essa animação é **ilustrativa**. A inferência real acontece no simulador, que chama a API.
 
