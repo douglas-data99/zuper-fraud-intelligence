@@ -6,7 +6,7 @@
 
 | | |
 |---|---|
-| **Aplicação** | https://fraude-analytics.zuperdata.com.br (5 páginas: operações, simulador, motor de decisão, Data Science Lab e MLOps) |
+| **Aplicação** | https://fraude-analytics.zuperdata.com.br (6 páginas: visão executiva, simulador bancário, motor de decisão, Data Science Lab, monitoramento do modelo e MLOps) |
 | **API** | https://api-fraude.zuperdata.com.br/docs (FastAPI, VPS própria) |
 | **Vídeo (4 min)** | [Apresentação do projeto](https://github.com/douglas-data99/zuper-fraud-intelligence/releases/tag/v1.0) (prints reais, narração) |
 | **Evidências** | `reports/` (métricas, curvas, testes, carga) · `docs/prints/` (prints reais) · `docs/DIARIO.md` (como foi feito, incluindo os erros) |

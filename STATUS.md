@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Aplicação | https://fraude-analytics.zuperdata.com.br |
-| API | https://api-fraude.zuperdata.com.br (provisório; documentação em `/docs`) |
+| API | https://api-fraude.zuperdata.com.br (documentação em `/docs`) |
 | Código | https://github.com/douglas-data99/zuper-fraud-intelligence |
 | Estudo BAF | https://github.com/douglas-data99/deteccao-fraude-abertura-de-contas |
 | Portfólio | https://zuperdata.com.br/douglas-portifolio · código em https://github.com/douglas-data99/portfolio |
