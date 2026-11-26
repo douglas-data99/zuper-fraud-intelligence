@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[2]
-PADROES = [r"github_pat_[A-Za-z0-9_]{20,}", r"KGAT_[A-Za-z0-9]{10,}", r"-----BEGIN PRIVATE KEY-----", r"\"private_key\"\s*:", r"sk-ant-[A-Za-z0-9\-]{10,}"]
+PADROES = [r"github_pat_[A-Za-z0-9_]{20,}", r"KGAT_[A-Za-z0-9]{10,}", "-----BEGIN " + "PRIVATE KEY-----", r"\"private_key\"\s*:", r"sk-ant-[A-Za-z0-9\-]{10,}"]
 
 
 def arquivos_versionaveis():
@@ -24,6 +24,8 @@ def test_gitignore_protege_segredos_e_dados():
 def test_nenhum_segredo_em_arquivo_versionavel():
     achados = []
     for p in arquivos_versionaveis():
+        if "test_results" in p.parts:
+            continue  # saídas do próprio pytest (ecoam as mensagens de falha)
         if p.suffix in (".png", ".jpg", ".mp4", ".mp3", ".parquet", ".ico", ".woff2") or not p.exists() or p.stat().st_size > 5_000_000:
             continue
         txt = p.read_text(encoding="utf-8", errors="ignore")

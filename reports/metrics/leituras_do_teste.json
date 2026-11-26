@@ -1,4 +1,14 @@
 [
-  {"quando": "2026-11-26 03:58", "motivo": "1ª leitura: ensaio de depuração do pipeline (sem Optuna). Nenhuma escolha foi feita a partir do teste."},
-  {"quando": "2026-11-26 04:49", "motivo": "2ª leitura: execução final com Optuna."}
+  {
+    "quando": "2026-11-26 03:58",
+    "motivo": "1ª leitura: ensaio de depuração do pipeline (sem Optuna). Nenhuma escolha foi feita a partir do teste."
+  },
+  {
+    "quando": "2026-11-26 04:49",
+    "motivo": "2ª leitura: execução final com Optuna."
+  },
+  {
+    "quando": "2026-11-26 05:40:57",
+    "motivo": "3ª leitura: correção de bugs apontados pela revisão E2 (bundle servia árvores além do best_iteration; grade de cortes grossa; early stopping limitado pelo teto). Não motivada pelo resultado do teste."
+  }
 ]
