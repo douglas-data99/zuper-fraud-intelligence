@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Zuper Fraud Intelligence: vídeo</title>
+<style>
+  :root { --bg:#070a0f; --ink:#e9eef5; --ink2:#a7b3c2; --azul:#3b82f6; --verde:#22c55e; --ambar:#f5a524; --verm:#ef4444; --linha:#243041; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  #palco { position: absolute; inset: 0; overflow: hidden; }
+  .fundo { position: absolute; inset: -40px; background:
+      radial-gradient(1200px 700px at 15% 10%, rgba(59,130,246,.18), transparent 60%),
+      radial-gradient(900px 600px at 90% 90%, rgba(34,197,94,.12), transparent 60%), var(--bg); }
+  .grade { position: absolute; inset: -200px; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 64px 64px; }
+  .cena { position: absolute; inset: 0; will-change: transform, filter, opacity; }
+  .janela { position: absolute; left: 150px; top: 120px; width: 1620px; height: 820px; border-radius: 18px; overflow: hidden;
+    border: 1px solid #2b3747; box-shadow: 0 40px 90px -30px rgba(0,0,0,.9); background: #0c1118; }
+  .janela img { position: absolute; left: 0; top: 0; width: 100%; transform-origin: 50% 0; }
+  .janela .b { opacity: 0; }
+  .barra-jan { position: absolute; left: 150px; top: 84px; height: 36px; width: 1620px; display: flex; align-items: center; gap: 8px;
+    padding-left: 16px; color: var(--ink2); font-size: 18px; }
+  .barra-jan i { width: 12px; height: 12px; border-radius: 12px; background: #2b3747; display: inline-block; }
+  .chamada { position: absolute; padding: 22px 28px; border-radius: 16px; background: rgba(12,17,24,.92); border: 1px solid #2f3d52;
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,.9); min-width: 300px; opacity: 0; }
+  .chamada b { display: block; font-size: 56px; line-height: 1.05; font-weight: 800; letter-spacing: -.02em; }
+  .chamada span { display: block; font-size: 24px; color: var(--ink2); margin-top: 6px; }
+  .verde b { color: var(--verde); } .azul b { color: #7fb0ff; } .ambar b { color: var(--ambar); } .verm b { color: #ff7a7a; }
+  .titulo { position: absolute; left: 160px; top: 300px; width: 1600px; }
+  .titulo h1 { font-size: 104px; line-height: 1.02; letter-spacing: -.03em; font-weight: 800; }
+  .titulo p { font-size: 36px; color: var(--ink2); margin-top: 22px; }
+  .tags { display: flex; gap: 14px; margin-top: 34px; }
+  .tag { font-size: 24px; padding: 8px 18px; border-radius: 999px; border: 1px solid #344257; color: var(--ink2); opacity: 0; }
+  .logo { width: 84px; height: 84px; border-radius: 20px; background: linear-gradient(135deg, #3b82f6, #22c55e); color: #04121f;
+    display: grid; place-items: center; font-size: 52px; font-weight: 900; margin-bottom: 30px; }
+  .caixa { position: absolute; border-radius: 18px; border: 1px solid #2f3d52; background: rgba(15,21,30,.95); padding: 26px 30px; opacity: 0; }
+  .caixa h3 { font-size: 34px; margin-bottom: 8px; }
+  .caixa p { font-size: 23px; color: var(--ink2); line-height: 1.35; }
+  .seta { position: absolute; height: 4px; background: linear-gradient(90deg, #3b82f6, #22c55e); transform-origin: 0 50%; opacity: .9; }
+  .rot { position: absolute; font-size: 22px; color: var(--ink2); }
+  .chip { position: absolute; font-size: 30px; padding: 14px 24px; border-radius: 14px; background: #121a25; border: 1px solid #2f3d52; opacity: 0; }
+  .ponto { position: absolute; width: 22px; height: 22px; border-radius: 22px; background: #3b82f6; }
+  #legenda { position: absolute; left: 0; right: 0; bottom: 34px; text-align: center; font-size: 34px; font-weight: 600; color: #fff;
+    text-shadow: 0 2px 12px rgba(0,0,0,.9); padding: 0 200px; }
+  #legenda span { background: rgba(5,8,12,.72); padding: 6px 16px; border-radius: 10px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  #selo { position: absolute; right: 40px; top: 26px; font-size: 18px; color: var(--ink2); border: 1px solid #2b3747; border-radius: 999px; padding: 6px 14px; background: rgba(7,10,15,.7); }
+  #progresso { position: absolute; left: 0; bottom: 0; height: 5px; background: linear-gradient(90deg, #3b82f6, #22c55e); }
+</style>
+</head>
+<body>
+<div id="palco">
+  <div class="fundo"></div><div class="grade" id="grade"></div>
+  <div id="cenas"></div>
+  <div id="legenda"></div>
+  <div id="selo">Projeto de portfólio · dados sintéticos públicos</div>
+  <div id="progresso"></div>
+</div>
+<script>
+// ---------------------------------------------------------------- dados injetados pelo render (roteiro, durações, palavras)
+const D = window.__DADOS__;
+const LEAD = 0.6, GAP = 0.45, FIM = 2.5;
+const P = "../docs/prints/";
+const ease = { out: x => 1 - Math.pow(1 - x, 4), in: x => x * x * x, io: x => x < .5 ? 8*x*x*x*x : 1 - Math.pow(-2*x+2, 4)/2 };
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+
+// linha do tempo
+let t0 = LEAD;
+const SEG = D.roteiro.map(s => { const d = D.duracoes[s.id]; const o = { ...s, ini: t0, fim: t0 + d, dur: d }; t0 += d + GAP; return o; });
+window.DURACAO = t0 - GAP + FIM;
+window.FALAS = SEG.map(s => ({ id: s.id, ini: s.ini }));
+
+// tempo (absoluto) da 1ª palavra que contém "chave" dentro da fala; senão, fração da fala
+function quando(s, chave, frac = 0.3) {
+  const ws = D.palavras[s.id] || [];
+  const k = chave.toLowerCase();
+  const w = ws.find(x => x.w.toLowerCase().replace(/[.,;:!?]/g, "").includes(k));
+  return s.ini + (w ? w.t : frac * s.dur);
+}
+
+// ---------------------------------------------------------------- construção das cenas
+const raiz = document.getElementById("cenas");
+function el(html) { const d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstChild; }
+function janela(img, img2, url) {
+  return `<div class="barra-jan"><i></i><i></i><i></i><span style="margin-left:14px">${url}</span></div>
+          <div class="janela"><img class="a" src="${P + img}">${img2 ? `<img class="b" src="${P + img2}">` : ""}</div>`;
+}
+function chamada(cls, x, y, b, sp) { return `<div class="chamada ${cls}" style="left:${x}px;top:${y}px"><b>${b}</b><span>${sp}</span></div>`; }
+
+const DEF = {
+  titulo: s => ({ html: `<div class="titulo"><div class="logo">Z</div><h1>Zuper Fraud<br>Intelligence</h1>
+      <p>Detecção de fraude em tempo real e decisão de risco: do dado bruto à ação.</p>
+      <div class="tags"><span class="tag">BigQuery</span><span class="tag">XGBoost calibrado</span><span class="tag">FastAPI + Redis Streams</span><span class="tag">MLflow</span><span class="tag">Decisão por custo</span></div></div>`,
+      evs: [[".tag", ["bigquery", "completo", "construído", "zero", "dados"].map((k, i) => quando(s, k, .1 + i * .08))]] }),
+  problema: s => ({ html: janela("01-centro-operacoes-inteira.png", null, "zuper-fraud-intelligence.vercel.app") +
+      chamada("verm", 1110, 640, "US$ 1,13 mi", "de fraude se aprovasse tudo") + chamada("azul", 230, 700, "Modelo estima o risco", "Motor decide a ação pelo custo"),
+      pan: [0.42, 0.62], zoom: [1.0, 1.05], evs: [[".chamada", [quando(s, "custaria"), quando(s, "motor")]]] }),
+  resultado: s => ({ html: janela("01-centro-operacoes.png", null, "zuper-fraud-intelligence.vercel.app") +
+      chamada("verde", 1250, 160, "99,18%", "aprovadas direto") + chamada("ambar", 1250, 340, "0,30% · 0,52%", "verificação · análise") +
+      chamada("verde", 1250, 520, "99,3%", "do valor fraudado sinalizado") + chamada("azul", 1250, 700, "US$ 1,03 mi", "benefício líquido simulado"),
+      pan: [0.18, 0.3], zoom: [1.02, 1.1], evs: [[".chamada", [quando(s, "99"), quando(s, "recebem"), quando(s, "valor"), quando(s, "benefício")]]] }),
+  dados: s => ({ html: `
+      <div class="caixa" style="left:170px;top:330px;width:480px"><h3 style="color:#d6a274">Bronze</h3><p>Arquivo original do Kaggle, SHA-256 conferido, 1.852.394 transações</p></div>
+      <div class="caixa" style="left:720px;top:330px;width:480px"><h3 style="color:#c9d3df">Silver</h3><p>Sem dados pessoais. Cartão vira hash com sal. Qualidade: 0 duplicatas, 0 nulos</p></div>
+      <div class="caixa" style="left:1270px;top:330px;width:480px"><h3 style="color:#f2c94c">Gold</h3><p>20 variáveis point-in-time por transação, prontas para treino e auditoria</p></div>
+      <div class="rot" style="left:170px;top:250px;font-size:30px;color:#e9eef5;font-weight:700">BigQuery · projeto exclusivo com teto de R$ 50</div>
+      <div class="chamada azul" style="left:170px;top:640px"><b>1,85 milhão</b><span>de transações de cartão (Sparkov, CC0)</span></div>`,
+      evs: [[".caixa", [quando(s, "bronze"), quando(s, "silver"), quando(s, "gold")]], [".chamada", [quando(s, "milhão", .15)]]] }),
+  features: s => ({ html: `
+      <div class="rot" style="left:170px;top:220px;font-size:30px;color:#e9eef5;font-weight:700">Histórico do cartão · só o passado</div>
+      <div style="position:absolute;left:170px;top:470px;width:1580px;height:4px;background:#2b3747"></div>
+      ${[0, 90, 160, 300, 420, 470, 610, 720, 790, 905, 980, 1100, 1180, 1240].map(x => `<div class="ponto" style="left:${190 + x}px;top:461px"></div>`).join("")}
+      <div class="ponto" style="left:1640px;top:452px;width:40px;height:40px;background:#ef4444"></div>
+      <div class="rot" style="left:1590px;top:510px">transação atual (t)</div>
+      <div id="janelaT" style="position:absolute;top:410px;height:120px;border:3px solid #22c55e;border-radius:12px;background:rgba(34,197,94,.08)"></div>
+      <div class="rot" id="rotJan" style="top:540px;color:#22c55e">janela termina em t − 1 s</div>
+      <div class="chip" style="left:170px;top:650px">ticket médio</div><div class="chip" style="left:440px;top:650px">velocidade de compras</div>
+      <div class="chip" style="left:830px;top:650px">loja nova</div><div class="chip" style="left:1060px;top:650px">hábito por categoria</div>
+      <div class="chamada verde" style="left:1180px;top:760px"><b>BigQuery = API</b><span>teste de paridade: 0 divergências</span></div>`,
+      evs: [[".chip", [quando(s, "ticket"), quando(s, "velocidade"), quando(s, "loja"), quando(s, "hábito")]], [".chamada", [quando(s, "teste")]]],
+      extra: (t, e) => { const p = ease.io(clamp((t - quando(s, "passado")) / 1.6));
+        const j = e.querySelector("#janelaT"); j.style.left = (1640 - 40 - 900 * p) + "px"; j.style.width = (900 * p) + "px";
+        e.querySelector("#rotJan").style.left = (1640 - 40 - 900 * p) + "px"; e.querySelector("#rotJan").style.opacity = p; } }),
+  modelos: s => ({ html: janela("04-data-science-lab-inteira.png", null, "zuper-fraud-intelligence.vercel.app/lab") +
+      chamada("ambar", 1230, 560, "AP 0,763", "só a transação") + chamada("verde", 1230, 740, "AP 0,955", "com o histórico do cliente"),
+      pan: [0.13, 0.2], zoom: [1.0, 1.05], evs: [[".chamada", [quando(s, "transação"), quando(s, "histórico")]]] }),
+  estresse: s => ({ html: janela("04-data-science-lab-inteira.png", null, "zuper-fraud-intelligence.vercel.app/lab") +
+      chamada("verm", 230, 560, "Teto US$ 1.376", "nenhuma fraude acima disso na base") + chamada("ambar", 230, 740, "AP 0,958 → 0,538", "sem as variáveis de valor") +
+      chamada("azul", 1180, 650, "Teto otimista", "não é promessa para banco real"),
+      pan: [0.62, 0.72], zoom: [1.0, 1.04], evs: [[".chamada", [quando(s, "1"), quando(s, "sem"), quando(s, "otimista")]]] }),
+  decisao: s => ({ html: janela("03-motor-decisao.png", null, "zuper-fraud-intelligence.vercel.app/decisao") +
+      chamada("azul", 1230, 600, "3 níveis", "aprovar · verificar · reter") + chamada("verde", 1230, 770, "−11% de custo", "contra a política de um corte"),
+      pan: [0.0, 0.1], zoom: [1.0, 1.06], evs: [[".chamada", [quando(s, "três"), quando(s, "onze")]]] }),
+  simulador: s => ({ html: janela("02-simulador-habitual-inteira.png", "02-simulador-atipico-inteira.png", "zuper-fraud-intelligence.vercel.app/simulador") +
+      chamada("verde", 1260, 220, "Aprovada", "compra de rotina") + chamada("verm", 1260, 420, "Retida", "valor alto, madrugada, loja nova") +
+      chamada("azul", 1260, 620, "Por quê?", "contribuição de cada variável"),
+      pan: [0.18, 0.42], zoom: [1.0, 1.04], troca: quando(s, "alta"), evs: [[".chamada", [quando(s, "aprovada"), quando(s, "retida"), quando(s, "porquê")]]] }),
+  arquitetura: s => ({ html: `
+      <div class="caixa" style="left:150px;top:200px;width:330px"><h3>Next.js</h3><p>interface na Vercel</p></div>
+      <div class="caixa" style="left:620px;top:200px;width:360px"><h3>FastAPI</h3><p>modelo em memória, sem BigQuery</p></div>
+      <div class="caixa" style="left:1120px;top:200px;width:330px"><h3>Redis</h3><p>perfis do cliente, lookup em ~1 ms</p></div>
+      <div class="caixa" style="left:620px;top:520px;width:360px"><h3>Redis Streams</h3><p>evento por decisão, ACK só depois de gravar</p></div>
+      <div class="caixa" style="left:1120px;top:520px;width:330px"><h3>Worker</h3><p>atualiza histórico, grava em lote</p></div>
+      <div class="caixa" style="left:1520px;top:520px;width:300px"><h3 style="color:#f2c94c">BigQuery</h3><p>auditoria e análise</p></div>
+      <div class="caixa" style="left:620px;top:800px;width:520px;border-color:#6b2a2a"><h3 style="color:#ff7a7a">Fila de defeitos (DLQ)</h3><p>mensagem com problema não trava o fluxo</p></div>`,
+      evs: [[".caixa", [s.ini + .3, quando(s, "api"), quando(s, "consultar"), quando(s, "evento"), quando(s, "worker"), quando(s, "grava"), quando(s, "defeito")]]] }),
+  mlflow: s => ({ html: janela("mlflow-experimentos.png", "mlflow-registry.png", "MLflow (privado, via túnel SSH)") +
+      chamada("ambar", 1180, 560, "v1 substituída", "bug encontrado na revisão") + chamada("verde", 1180, 730, "v2 = champion", "promoção manual por alias"),
+      pan: [0.0, 0.08], zoom: [1.0, 1.05], troca: quando(s, "registro"), evs: [[".chamada", [quando(s, "substituída"), quando(s, "campeã")]]] }),
+  monitoramento: s => ({ html: janela("05-mlops-inteira.png", null, "zuper-fraud-intelligence.vercel.app/mlops") +
+      chamada("azul", 1200, 520, "Relógio virtual", "replay do período de teste") + chamada("ambar", 1200, 690, "Rótulo em D+30", "recall só na safra madura") +
+      chamada("verde", 230, 760, "PSI", "drift de score e de variáveis"),
+      pan: [0.0, 0.45], zoom: [1.0, 1.03], evs: [[".chamada", [quando(s, "relógio"), quando(s, "trinta"), quando(s, "drift")]]] }),
+  evidencias: s => ({ html: `
+      <div class="chamada verde" style="left:170px;top:300px"><b>41 testes</b><span>automatizados passando, com saída guardada</span></div>
+      <div class="chamada azul" style="left:780px;top:300px"><b>Revisão por etapa</b><span>agente independente antes de seguir</span></div>
+      <div class="chamada ambar" style="left:170px;top:560px"><b>Bugs reais achados</b><span>e corrigidos, com registro no diário</span></div>
+      <div class="chamada verde" style="left:780px;top:560px"><b>0% de erro</b><span>no teste de carga, condições declaradas</span></div>`,
+      evs: [[".chamada", [quando(s, "revisada"), quando(s, "independente"), quando(s, "bugs"), quando(s, "carga")]]] }),
+  fechamento: s => ({ html: `<div class="titulo" style="top:250px"><div class="logo">Z</div><h1 style="font-size:84px">Modelagem, engenharia<br>e decisão de negócio</h1>
+      <p style="margin-top:36px">zuper-fraud-intelligence.vercel.app</p><p>github.com/douglas-data99/zuper-fraud-intelligence</p><p>zuperdata.com.br/douglas-portifolio</p></div>`, evs: [] }),
+};
+
+const CENAS = SEG.map(s => {
+  const d = DEF[s.cena](s);
+  const e = el(`<div class="cena">${d.html}</div>`);
+  raiz.appendChild(e);
+  const evs = [];
+  (d.evs || []).forEach(([sel, ts]) => e.querySelectorAll(sel).forEach((n, i) => evs.push([n, ts[i] ?? ts[ts.length - 1]])));
+  return { s, d, e, evs, imgs: e.querySelectorAll(".janela img"), jan: e.querySelector(".janela") };
+});
+
+// ---------------------------------------------------------------- estado em função do tempo (determinístico)
+const leg = document.getElementById("legenda");
+window.irPara = function (t) {
+  document.getElementById("grade").style.transform = `translate(${-(t * 6) % 64}px, ${-(t * 3) % 64}px)`;
+  document.getElementById("progresso").style.width = (100 * clamp(t / window.DURACAO)) + "%";
+  CENAS.forEach((c, k) => {
+    const prox = CENAS[k + 1];
+    const ini = k === 0 ? 0 : c.s.ini - GAP / 2;
+    const fim = prox ? prox.s.ini - GAP / 2 : window.DURACAO;
+    const vis = t >= ini - 0.5 && t <= fim + 0.5;
+    c.e.style.display = vis ? "block" : "none";
+    if (!vis) return;
+    // speed ramp: entra da direita freando (expo.out), sai para a esquerda acelerando, com desfoque de movimento
+    const ent = k === 0 ? 1 : clamp((t - ini + 0.25) / 0.55), sai = prox ? clamp((t - fim + 0.25) / 0.4) : 0;
+    let x = 0, blur = 0, op = 1;
+    if (ent < 1) { const e = ease.out(ent); x = (1 - e) * 560; blur = (1 - e) * 18; op = clamp(ent * 3); }
+    if (sai > 0) { const e = ease.in(sai); x = -e * 700; blur = e * 22; op = 1 - clamp((sai - .6) * 2.5); }
+    c.e.style.transform = `translateX(${x}px)`; c.e.style.filter = blur > .3 ? `blur(${blur}px)` : "none"; c.e.style.opacity = op;
+    // câmera: zoom lento + pan vertical nas capturas longas
+    const p = clamp((t - c.s.ini) / (c.s.dur + GAP));
+    if (c.jan) {
+      const [z0, z1] = c.d.zoom || [1, 1.04], [p0, p1] = c.d.pan || [0, 0];
+      const z = z0 + (z1 - z0) * ease.io(p);
+      c.imgs.forEach(img => {
+        const h = img.naturalHeight * (1620 / img.naturalWidth);
+        const pan = (p0 + (p1 - p0) * ease.io(p)) * Math.max(0, h - 820 / z);
+        img.style.transform = `translateY(${-pan}px) scale(${z})`;
+      });
+      if (c.d.troca && c.imgs[1]) c.imgs[1].style.opacity = clamp((t - c.d.troca) / 0.5);
+    }
+    // elementos entram na palavra: 0,5 s com ease-out, deslocamento de 30 px
+    c.evs.forEach(([n, te]) => { const q = ease.out(clamp((t - te) / 0.5)); n.style.opacity = q; n.style.transform = `translateY(${(1 - q) * 30}px)`; });
+    if (c.d.extra) c.d.extra(t, c.e);
+  });
+  // legenda: blocos de até 7 palavras da fala atual
+  const s = SEG.find(x => t >= x.ini - 0.1 && t <= x.fim + 0.25);
+  if (!s) { leg.innerHTML = ""; return; }
+  const ws = D.palavras[s.id] || [], tr = t - s.ini;
+  let i = ws.findIndex((w, j) => (ws[j + 1] ? ws[j + 1].t : 1e9) > tr);
+  if (i < 0) i = ws.length - 1;
+  const b = Math.floor(i / 7) * 7;
+  leg.innerHTML = "<span>" + ws.slice(b, b + 7).map(w => w.w).join(" ") + "</span>";
+};
+Promise.all([...document.images].map(i => i.decode().catch(() => {}))).then(() => { irPara(0); window.pronto = true; });
+</script>
+</body>
+</html>

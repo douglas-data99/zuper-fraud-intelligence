@@ -108,3 +108,49 @@ Registro contínuo de etapas, decisões, dúvidas e dificuldades. Ele serve de b
 - **Pendente para o Douglas:** o classificador de segurança me impediu (corretamente) de acessar o Redis do WhatsApp para conferir e limpar. Se quiser remover a chave órfã, que é pequena e não interfere na Evolution, porque a Evolution não usa o prefixo `fraud:`:
   `docker exec evolution-redis-1 redis-cli DEL fraud:replay:comando` (e o mesmo em `evolution-prospect-prospect-redis-1`, se existir lá).
 - **Lição:** em rede compartilhada, nunca usar nome de serviço genérico. Registrada também em `docs/architecture.md`.
+
+### E2: revisão (2 rodadas) → APROVADO
+- **1ª rodada (REPROVADO):**
+  - o bundle servia árvores além do `best_iteration`;
+  - a grade de cortes tinha passos de 442 linhas, o que deixava a sensibilidade inútil;
+  - o early stopping era limitado pelo teto de árvores;
+  - a ablação usava o modelo errado;
+  - o segmento "frio" é artefato (cartões só de fraude).
+- **Correções e novo treino** (3ª leitura do teste, declarada em `leituras_do_teste.json`). Números finais:
+  - AP 0,9583; ROC-AUC 0,9990; recall 98,1% com 0,5% de FPR;
+  - 1.662 árvores, com o early stopping parando de fato;
+  - Brier no teste: 0,000588 → 0,000551 (sigmoide);
+  - cortes 0,0082 / 0,0388;
+  - aprova 99,18%, verifica 0,30%, investiga 0,52%;
+  - 99,3% do valor fraudado sinalizado;
+  - 3 níveis custam 11% menos que 1 corte;
+  - C1 0,538, C2 0,236, C3 0,945, C4 0,951;
+  - Optuna empatou com o modelo base.
+- **2ª rodada: APROVADO.** Bundle e política recalculados à mão bateram com diferença 0.
+
+### E3 a E5: API, interface, deploy → APROVADO (após 2 rodadas)
+- **1ª rodada (REPROVADO).** Os problemas e as correções:
+  - **Memória do Redis** acabaria em cerca de 6 h de replay. Agora: stream limitado com XDEL, TTL curto e rótulos maduros como contadores.
+  - **Simulador** mostrava o histórico de outro cartão (closure velha). Corrigido com uma ref do cartão atual.
+  - **Worker** podia perder update. Agora o marcador `applied` é gravado no mesmo MULTI do perfil.
+  - **BigQuery** recebia duplicatas, porque a persistência é "pelo menos uma vez". Criadas as views `v_predictions`, `v_decisions` e `v_auditoria_diaria`.
+  - **Mensagem envenenada** entrava em loop. Agora vai para a DLQ.
+  - **Nome genérico `api`** na rede compartilhada. Renomeado para `zfi-api`.
+  - **Shadow comparado errado** (RF sem calibração cortado pelos cortes do XGB). Agora o RF tem cortes próprios, com a mesma taxa de alerta.
+  - **PSI com janela curta** acusava drift em `hour`. Janela de 20 mil eventos, sem `hour`.
+  - **Menores:** 503 em todo endpoint, `extra=forbid`, N/D, acentos, Lab sem números fixos no código.
+- **Falha de segurança achada por mim no teste de carga:** o rate limit confiava no 1º IP do X-Forwarded-For, que o cliente pode forjar. Corrigido, com teste.
+- **2ª rodada:** sobrou um bloqueio (o Redis encheria em cerca de 25 h). Corrigido com `volatile-ttl` e TTL de 6 h no replay. **APROVADO.**
+- **Desempenho:** o score passou a sair da soma das contribuições SHAP, numa passada só (diferença de 6e-8). Carga na VPS, com a API limitada a 0,8 vCPU: 300 requisições, 4 simultâneas, 7,5 req/s, p50 512 ms ponta a ponta, 0% de erro.
+
+### E8: publicação (concluída)
+- **GitHub (douglas-data99, públicos):**
+  - `zuper-fraud-intelligence`
+  - `deteccao-fraude-abertura-de-contas`
+  - `portfolio` (sem a pasta `tcc/`)
+  - Commits com o e-mail noreply. Nenhum segredo, conferido pelo teste de segurança.
+- **Aplicação:** https://zuper-fraud-intelligence.vercel.app (Next.js 15.5.29; a Vercel recusou a 15.3.3 por vulnerabilidade).
+- **API:** https://zfi-api.2-29-40-32.sslip.io. Endereço provisório: falta o DNS de `api-fraude.zuperdata.com.br`.
+- **Portfólio:** https://zuperdata.com.br/douglas-portifolio, com os 2 projetos de fraude cadastrados.
+  - Antes do deploy, conferi que a pasta local `zuperdata_site` era idêntica ao site no ar (hash dos arquivos e redirect do /admin). Assim, o deploy só acrescentou o portfólio.
+  - **A pasta `zuperdata_site/douglas-portifolio/` não foi commitada no repositório SITES:** fica para o Douglas.
