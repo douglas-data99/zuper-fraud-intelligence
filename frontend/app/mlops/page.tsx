@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Cabecalho } from "@/components/Kpi";
 import { api, dado, fmt } from "@/lib/api";
 
 function Ponto({ ok }: { ok: boolean | null }) {
@@ -40,17 +42,16 @@ export default function Mlops() {
 
   return (
     <>
-      <span className="aviso">Estado real dos serviços, lido da API a cada 8 s · o que não está implementado aparece como roadmap</span>
-      <div className="cabeca"><div>
-        <h1>Engenharia e MLOps</h1>
+      <Cabecalho eyebrow="Technology · Engenharia" titulo="Engenharia e MLOps">
         <p>Caminho síncrono sem BigQuery: perfil no Redis, modelo em memória, decisão em milissegundos. O histórico analítico, as features de treino e a trilha de auditoria ficam no BigQuery.</p>
-      </div></div>
+        <div className="meta"><span className="selo vivo">estado real dos serviços, lido a cada 8 s</span><span>o que não está implementado aparece como roadmap</span></div>
+      </Cabecalho>
       {erro && <div className="estado erro">{erro}</div>}
 
       <div className="card">
         <h2>Arquitetura (estado ao vivo)</h2>
         <div className="grade g4" style={{ alignItems: "stretch" }}>
-          <Caixa titulo="Next.js (Vercel)" sub="interface, 5 páginas" ok={true} />
+          <Caixa titulo="Next.js (Vercel)" sub="interface, 6 páginas" ok={true} />
           <Caixa titulo="FastAPI" sub="validação, features, inferência, decisão" ok={st ? st.api?.status === "ok" : null} extra={st?.api?.modelo_carregado} />
           <Caixa titulo="Redis (feature store online)" sub="perfis e lojas, lookup O(1)" ok={st ? st.redis?.status === "ok" : null} extra={st?.redis?.perfis ? `${st.redis.perfis} perfis` : undefined} />
           <Caixa titulo="Redis Streams" sub="eventos de transação e decisão" ok={st ? st.stream?.pendentes_sem_ack != null : null} extra={st?.stream ? `${fmt.num(st.stream.tamanho)} no stream · ${st.stream.pendentes_sem_ack ?? "N/D"} sem ACK · lag ${st.stream.lag ?? "N/D"}` : undefined} />
@@ -84,7 +85,7 @@ export default function Mlops() {
                   <tr key={k}><td>{k}</td><td className="n mono">{v == null ? "N/D" : v.toFixed(3)}</td>
                     <td>{v == null ? "amostra pequena" : v < 0.1 ? "estável" : v < 0.25 ? "atenção" : "investigar"}</td></tr>
                 ))}</tbody></table>
-              <p className="nota">{mon.psi_regra}</p>
+              <p className="nota">{mon.psi_regra} Evolução mês a mês do modelo congelado: <Link href="/monitoramento">Monitoramento do modelo →</Link></p>
             </>
           )}
         </div>

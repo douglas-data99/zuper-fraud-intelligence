@@ -1,9 +1,9 @@
 {
-  "data": "2026-11-26 06:17:41",
+  "data": "2026-11-26 12:02:57",
   "python": "3.11.9",
   "comando": "-m pytest tests -v -p no:cacheprovider --junitxml=C:\\Users\\Douglas\\Documents\\SITES\\projetos-dados\\zuper-fraud-intelligence\\reports\\test_results\\junit.xml",
   "exit_code": 0,
-  "duracao_s": 74.1,
+  "duracao_s": 87.2,
   "passaram": 41,
   "falharam": 0,
   "pulados": 0,
@@ -11,17 +11,17 @@
     {
       "nome": "test_api_stream::test_health",
       "resultado": "passou",
-      "segundos": 3.337
+      "segundos": 5.686
     },
     {
       "nome": "test_api_stream::test_score_valido_sem_escrita",
       "resultado": "passou",
-      "segundos": 0.073
+      "segundos": 0.091
     },
     {
       "nome": "test_api_stream::test_entrada_invalida_422[ruim0]",
       "resultado": "passou",
-      "segundos": 0.006
+      "segundos": 0.009
     },
     {
       "nome": "test_api_stream::test_entrada_invalida_422[ruim1]",
@@ -31,12 +31,12 @@
     {
       "nome": "test_api_stream::test_entrada_invalida_422[ruim2]",
       "resultado": "passou",
-      "segundos": 0.005
+      "segundos": 0.007
     },
     {
       "nome": "test_api_stream::test_entrada_invalida_422[ruim3]",
       "resultado": "passou",
-      "segundos": 0.005
+      "segundos": 0.006
     },
     {
       "nome": "test_api_stream::test_entrada_invalida_422[ruim4]",
@@ -46,17 +46,17 @@
     {
       "nome": "test_api_stream::test_cartao_desconhecido_404_e_loja_desconhecida_422",
       "resultado": "passou",
-      "segundos": 0.014
+      "segundos": 0.015
     },
     {
       "nome": "test_api_stream::test_transacao_exige_id_e_e_idempotente",
       "resultado": "passou",
-      "segundos": 0.076
+      "segundos": 0.103
     },
     {
       "nome": "test_api_stream::test_stream_worker_ack_e_atualizacao_do_perfil",
       "resultado": "passou",
-      "segundos": 0.603
+      "segundos": 0.704
     },
     {
       "nome": "test_api_stream::test_recuperacao_apos_falha_do_worker",
@@ -66,27 +66,27 @@
     {
       "nome": "test_api_stream::test_falha_de_dependencia_e_explicita",
       "resultado": "passou",
-      "segundos": 4.034
+      "segundos": 4.021
     },
     {
       "nome": "test_api_stream::test_endpoints_protegidos",
       "resultado": "passou",
-      "segundos": 0.011
+      "segundos": 0.013
     },
     {
       "nome": "test_api_stream::test_psi_detecta_perturbacao_controlada",
       "resultado": "passou",
-      "segundos": 0.016
+      "segundos": 0.004
     },
     {
       "nome": "test_api_stream::test_recall_nao_publicado_antes_da_maturacao",
       "resultado": "passou",
-      "segundos": 0.019
+      "segundos": 0.039
     },
     {
       "nome": "test_api_stream::test_rate_limit_nao_confia_no_ip_forjado",
       "resultado": "passou",
-      "segundos": 0.043
+      "segundos": 0.041
     },
     {
       "nome": "test_api_stream::test_campo_extra_rejeitado",
@@ -96,47 +96,47 @@
     {
       "nome": "test_api_stream::test_mensagem_envenenada_vai_para_dlq",
       "resultado": "passou",
-      "segundos": 0.01
+      "segundos": 0.011
     },
     {
       "nome": "test_api_stream::test_marcador_de_aplicacao_e_atomico",
       "resultado": "passou",
-      "segundos": 0.032
+      "segundos": 0.021
     },
     {
       "nome": "test_api_stream::test_redis_fora_do_ar_da_503_em_todo_endpoint",
       "resultado": "passou",
-      "segundos": 16.104
+      "segundos": 16.098
     },
     {
       "nome": "test_dados_modelo::test_split_temporal_sem_sobreposicao",
       "resultado": "passou",
-      "segundos": 1.496
+      "segundos": 2.077
     },
     {
       "nome": "test_dados_modelo::test_paridade_offline_online",
       "resultado": "passou",
-      "segundos": 2.801
+      "segundos": 3.175
     },
     {
       "nome": "test_dados_modelo::test_bundle_round_trip_reproduz_metrica",
       "resultado": "passou",
-      "segundos": 28.323
+      "segundos": 34.053
     },
     {
       "nome": "test_dados_modelo::test_calibrador_valido_e_monotono",
       "resultado": "passou",
-      "segundos": 0.716
+      "segundos": 0.851
     },
     {
       "nome": "test_dados_modelo::test_shadow_nunca_muda_a_decisao",
       "resultado": "passou",
-      "segundos": 11.537
+      "segundos": 13.292
     },
     {
       "nome": "test_dados_modelo::test_contribuicoes_somam_o_log_odds",
       "resultado": "passou",
-      "segundos": 1.804
+      "segundos": 1.962
     },
     {
       "nome": "test_decisao_custos::test_bordas_exatas",
@@ -151,17 +151,17 @@
     {
       "nome": "test_decisao_custos::test_custo_calculado_a_mao",
       "resultado": "passou",
-      "segundos": 0.0
+      "segundos": 0.001
     },
     {
       "nome": "test_decisao_custos::test_otimizador_igual_forca_bruta",
       "resultado": "passou",
-      "segundos": 0.016
+      "segundos": 0.022
     },
     {
       "nome": "test_decisao_custos::test_capacidade_de_investigacao_respeitada",
       "resultado": "passou",
-      "segundos": 0.002
+      "segundos": 0.003
     },
     {
       "nome": "test_decisao_custos::test_resumo_sem_dupla_contagem",
@@ -171,17 +171,17 @@
     {
       "nome": "test_decisao_custos::test_grade_enxerga_a_cauda",
       "resultado": "passou",
-      "segundos": 0.012
+      "segundos": 0.018
     },
     {
       "nome": "test_features::test_cold_start_explicito",
       "resultado": "passou",
-      "segundos": 0.0
+      "segundos": 0.001
     },
     {
       "nome": "test_features::test_janela_exclui_a_propria_e_o_mesmo_segundo",
       "resultado": "passou",
-      "segundos": 0.0
+      "segundos": 0.001
     },
     {
       "nome": "test_features::test_evento_futuro_nao_altera_feature_passada",
@@ -191,12 +191,12 @@
     {
       "nome": "test_features::test_limites_inclusivos_da_janela",
       "resultado": "passou",
-      "segundos": 0.0
+      "segundos": 0.001
     },
     {
       "nome": "test_features::test_rotulo_nunca_e_feature",
       "resultado": "passou",
-      "segundos": 0.0
+      "segundos": 0.001
     },
     {
       "nome": "test_seguranca::test_gitignore_protege_segredos_e_dados",
@@ -206,7 +206,7 @@
     {
       "nome": "test_seguranca::test_nenhum_segredo_em_arquivo_versionavel",
       "resultado": "passou",
-      "segundos": 0.079
+      "segundos": 0.13
     },
     {
       "nome": "test_seguranca::test_nenhum_dado_pessoal_na_interface",
