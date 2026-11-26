@@ -247,13 +247,17 @@ details.inline > summary::-webkit-details-marker { display: none; }
 .medidor { position: relative; height: 14px; border-radius: 999px; background: linear-gradient(90deg, var(--protecao) 0%, var(--protecao) var(--a), var(--atencao) var(--a), var(--atencao) var(--r), var(--risco) var(--r), var(--risco) 100%); opacity: .9; }
 .medidor .agulha { position: absolute; top: -6px; width: 4px; height: 26px; border-radius: 3px; background: var(--ink); box-shadow: 0 0 0 3px var(--bg); transform: translateX(-2px); transition: left .5s var(--ease); }
 .medidor-rot { display: flex; justify-content: space-between; font-size: .72rem; color: var(--ink-3); margin-top: 8px; }
+.medidor-leg { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .76rem; color: var(--ink-2); margin-top: 10px; }
+.medidor-leg i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .shap { list-style: none; padding: 0; margin: 0; display: grid; gap: 7px; }
 .shap { gap: 12px; }
 .shap li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 10px; align-items: baseline; font-size: .85rem; }
 .shap .nome { color: var(--ink); }
 .shap .nome small { color: var(--ink-3); font-family: var(--mono); font-size: .72rem; }
 table.compacta td { padding: 7px 4px; font-size: .84rem; }
-table.compacta td:first-child { white-space: nowrap; color: var(--ink-3); }
+table.compacta { table-layout: fixed; }
+table.compacta td:first-child { color: var(--ink-3); width: 52%; }
+table.compacta td.n { overflow-wrap: anywhere; }
 .shap .eixo { position: relative; height: 8px; grid-column: 1 / -1; background: rgba(255, 255, 255, .03); border-radius: 4px; }
 .shap .eixo::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--line); }
 .shap .eixo span { position: absolute; top: 0; height: 100%; border-radius: 3px; animation: surgir .3s var(--ease); }

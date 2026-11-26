@@ -110,8 +110,9 @@ export default function Simulador() {
 
   const ultimaEtapa = resp?.trilha?.length ? resp.trilha[resp.trilha.length - 1].ms : 0;
   const maxShap = resp ? Math.max(0.5, ...resp.reasons.itens.map((m: any) => Math.abs(m.contribuicao_log_odds))) : 1;
-  // posição no medidor em escala log (scores calibrados ficam quase todos perto de zero)
-  const posLog = (v: number) => Math.min(100, Math.max(0, ((Math.log10(Math.max(v, 1e-4)) + 4) / 4) * 100));
+  // medidor linear de 0 a 100% (probabilidade calibrada)
+  const posLin = (v: number) => Math.min(100, Math.max(0, v * 100));
+  const pctScore = (v: number) => fmt.pct(v, v < 0.01 ? 2 : 1);
   const media30 = perfil?.ultimos_30d?.media;
   const razao = media30 ? Number(form.amount_usd) / media30 : null;
   const TITULO: Record<string, string> = { aprovar: "Pagamento aprovado", autenticar: "Confirme que é você", investigar: "Pagamento em análise" };
@@ -224,17 +225,27 @@ export default function Simulador() {
             <div className="grade g2 painel" key={resp.transaction_id}>
               <div className="card">
                 <div className="card-cab"><h2>Resposta do modelo</h2><Acao a={resp.decision} /></div>
-                <div style={{ margin: "14px 0 6px", display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-.03em" }} className="mono">{resp.calibrated_score.toFixed(4)}</span>
-                  <span className="nota" style={{ margin: 0 }}>score calibrado (probabilidade estimada de fraude)</span>
+                <div style={{ margin: "14px 0 2px", display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: "2.2rem", fontWeight: 700, letterSpacing: "-.03em" }}>{pctScore(resp.calibrated_score)}</span>
+                  <span className="nota" style={{ margin: 0 }}>chance estimada de fraude (score calibrado)</span>
                 </div>
-                <div className="medidor" style={{ ["--a" as any]: `${posLog(resp.cortes.t_auth)}%`, ["--r" as any]: `${posLog(resp.cortes.t_review)}%` }} role="img"
-                  aria-label={`Score ${resp.calibrated_score.toFixed(4)}; verificação a partir de ${resp.cortes.t_auth.toFixed(4)}; investigação a partir de ${resp.cortes.t_review.toFixed(4)}`}>
-                  <span className="agulha" style={{ left: `${posLog(resp.calibrated_score)}%` }} />
+                <p style={{ margin: "0 0 12px", fontSize: ".9rem", color: resp.calibrated_score >= resp.cortes.t_review ? "var(--risco)" : resp.calibrated_score >= resp.cortes.t_auth ? "var(--atencao)" : "var(--protecao)" }}>
+                  {resp.calibrated_score >= resp.cortes.t_review ? `Acima do limite de investigação (${fmt.pct(resp.cortes.t_review, 1)})`
+                    : resp.calibrated_score >= resp.cortes.t_auth ? `Entre os limites de verificação (${fmt.pct(resp.cortes.t_auth, 1)}) e investigação (${fmt.pct(resp.cortes.t_review, 1)})`
+                    : `Abaixo do limite de verificação (${fmt.pct(resp.cortes.t_auth, 1)})`}
+                </p>
+                <div className="medidor" style={{ ["--a" as any]: `${posLin(resp.cortes.t_auth)}%`, ["--r" as any]: `${posLin(resp.cortes.t_review)}%` }} role="img"
+                  aria-label={`Chance de fraude ${pctScore(resp.calibrated_score)}; verificação a partir de ${fmt.pct(resp.cortes.t_auth, 1)}; investigação a partir de ${fmt.pct(resp.cortes.t_review, 1)}`}>
+                  <span className="agulha" style={{ left: `${posLin(resp.calibrated_score)}%` }} />
                 </div>
-                <div className="medidor-rot"><span>aprovar</span><span>verificar ≥ {resp.cortes.t_auth.toFixed(4)}</span><span>investigar ≥ {resp.cortes.t_review.toFixed(4)}</span></div>
+                <div className="medidor-rot"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+                <div className="medidor-leg">
+                  <span><i style={{ background: "var(--protecao)" }} />aprovar &lt; {fmt.pct(resp.cortes.t_auth, 1)}</span>
+                  <span><i style={{ background: "var(--atencao)" }} />verificar ≥ {fmt.pct(resp.cortes.t_auth, 1)}</span>
+                  <span><i style={{ background: "var(--risco)" }} />investigar ≥ {fmt.pct(resp.cortes.t_review, 1)}</span>
+                </div>
                 <table className="compacta" style={{ marginTop: 12 }}><tbody>
-                  <tr><td>Score bruto</td><td className="n mono">{resp.raw_score.toFixed(4)}</td></tr>
+                  <tr><td>Score bruto (antes da calibração)</td><td className="n mono">{resp.raw_score.toFixed(4)}</td></tr>
                   <tr><td>Modelo</td><td className="n mono" style={{ fontSize: ".75rem" }}>{resp.model_version}</td></tr>
                   <tr><td>Política</td><td className="n mono" style={{ fontSize: ".75rem" }}>{resp.policy_version}</td></tr>
                   <tr><td>Relógio virtual</td><td className="n mono">{resp.event_time.slice(0, 16).replace("T", " ")}</td></tr>
@@ -242,7 +253,7 @@ export default function Simulador() {
                   <tr><td>Correlação</td><td className="n mono">{resp.transaction_id.slice(0, 16)}…</td></tr>
                   <tr><td>Evento</td><td className="n">{status?.event_status_atual || resp.event_status}</td></tr>
                 </tbody></table>
-                <p className="nota">Medidor em escala logarítmica. {resp.shadow ? `Modo sombra: ${resp.shadow.modelo} daria score ${resp.shadow.score.toFixed(3)} → ${ROTULO_ACAO[resp.shadow.decisao_hipotetica]} (hipotético, nunca aplicado).` : ""}</p>
+                {resp.shadow && <p className="nota">Challenger (em observação, não decide): recomendaria {ROTULO_ACAO[resp.shadow.decisao_hipotetica]?.toLowerCase()} · score próprio {resp.shadow.score.toFixed(3)}, sem calibração.</p>}
               </div>
               <div className="card">
                 <div className="card-cab"><h2>Por que esta decisão</h2><span className="selo sem-ponto">SHAP</span></div>
