@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import Grafico from "@/components/Grafico";
+import Grafico, { COR } from "@/components/Grafico";
+import { Cabecalho } from "@/components/Kpi";
 import { dado, fmt } from "@/lib/api";
 
 type Amostra = { s: number[]; y: number[]; v: number[]; w: number[]; n_real: number; janela: string;
@@ -76,12 +77,11 @@ export default function Decisao() {
 
   return (
     <>
-      <span className="aviso">Exploração na janela de validação (policy) · o teste final usa a política congelada e não é ajustável aqui</span>
-      <div className="cabeca"><div>
-        <h1>Motor de decisão</h1>
+      <Cabecalho business eyebrow="Business · Política de risco" titulo="Motor de decisão">
         <p>O modelo dá o score; o motor decide. Mude os cortes e as premissas de custo e veja, em tempo real, perdas, atrito e fila de investigação.
           Mudar o corte <b>não</b> muda o modelo nem a AUC: muda só a operação.</p>
-      </div></div>
+        <div className="meta"><span className="selo premissa">exploração na janela de validação (policy)</span><span>o teste usa a política congelada, somente leitura</span></div>
+      </Cabecalho>
 
       <div className="grade g3">
         <div className="card">
@@ -90,7 +90,7 @@ export default function Decisao() {
           {corte(tr, setTr, "Investigação a partir de (t_review)")}
           {ta > tr && <p className="nota" style={{ color: "var(--warn)" }}>t_auth maior que t_review: tratado como t_auth = t_review.</p>}
           <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-            <button onClick={() => { const o = otimizar(d, p); setTa(o.ta); setTr(o.tr); }}>Otimizar com estas premissas</button>
+            <button className="primario" onClick={() => { const o = otimizar(d, p); setTa(o.ta); setTr(o.tr); }}>Otimizar com estas premissas</button>
             <button onClick={() => { setTa(d.politica_congelada.t_auth); setTr(d.politica_congelada.t_review); }}>Voltar à política congelada</button>
           </div>
         </div>
@@ -134,8 +134,8 @@ export default function Decisao() {
           <div className="card">
             <h2>Curva precisão × recall do Champion (teste)</h2>
             <Grafico altura={280} data={[
-              { type: "scatter", mode: "lines", x: champ.recall, y: champ.precision, name: "Champion", line: { color: "#3b82f6" } },
-              { type: "scatter", mode: "markers", x: [rec], y: [prec], name: "ponto operacional (janela policy)", marker: { size: 12, color: "#f5a524" } },
+              { type: "scatter", mode: "lines", x: champ.recall, y: champ.precision, name: "Champion", line: { color: COR.intel, width: 2.5 } },
+              { type: "scatter", mode: "markers", x: [rec], y: [prec], name: "ponto operacional (janela policy)", marker: { size: 13, color: COR.atencao, line: { color: "#090E17", width: 2 } } },
             ]} layout={{ xaxis: { title: { text: "recall" } }, yaxis: { title: { text: "precisão" }, range: [0, 1.02] } }} />
             <p className="nota">Linha de base do acaso (prevalência no teste): {fmt.pct(curvas.prevalencia, 2)}.</p>
           </div>

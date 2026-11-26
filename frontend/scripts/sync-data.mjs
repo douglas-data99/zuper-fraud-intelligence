@@ -4,7 +4,7 @@ const origem = "../reports/metrics";
 const destino = "public/data";
 mkdirSync(destino, { recursive: true });
 for (const f of ["resultados.json", "curvas.json", "politica_amostra.json", "serie_diaria_teste.json", "qualidade_silver.json",
-                 "ingestao.json", "splits.json", "optuna_trials.csv", "sensibilidade_politica.csv", "teste_pytest.json", "carga.json"]) {
+                 "ingestao.json", "splits.json", "optuna_trials.csv", "sensibilidade_politica.csv", "teste_pytest.json", "carga.json", "monitoramento.json"]) {
   if (existsSync(`${origem}/${f}`)) { copyFileSync(`${origem}/${f}`, `${destino}/${f}`); console.log("ok", f); }
   else console.log("ausente", f);
 }

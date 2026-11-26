@@ -22,3 +22,6 @@ load:        ## carrega o snapshot no Redis do compose
 	docker compose run --rm loader
 demo:        ## interface local
 	cd frontend && npm run sync-data && npm run dev
+
+monitor:
+	cd pipelines && python monitoramento.py

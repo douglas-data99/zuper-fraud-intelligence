@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import Grafico from "@/components/Grafico";
+import Grafico, { COR } from "@/components/Grafico";
+import { Cabecalho } from "@/components/Kpi";
 import { dado, fmt } from "@/lib/api";
 
 const REPO = "https://github.com/douglas-data99/zuper-fraud-intelligence";
@@ -25,20 +26,19 @@ export default function Lab() {
   }, []);
   if (!r || !c) return <div className="estado">carregando…</div>;
   const nomes = Object.keys(r.teste);
-  const cores = ["#3b82f6", "#22c55e", "#f5a524", "#a78bfa", "#ef4444", "#94a3b8"];
+  const cores = [COR.protecao, COR.intel, COR.atencao, COR.roxo, COR.risco, "#94a3B8", "#64748B"];
   const shap = Object.entries<number>(r.shap_top).slice(0, 12).reverse();
   const splits = Object.entries<any>(r.splits);
   const A = r.ablacao_A_vs_B_teste.A, B = r.ablacao_A_vs_B_teste.B;
 
   return (
     <>
-      <span className="aviso">Todos os números e gráficos desta página vêm de artefatos gerados pela execução real do pipeline</span>
-      <div className="cabeca"><div>
-        <h1>Data Science Lab</h1>
+      <Cabecalho eyebrow="Technology · Ciência de dados" titulo="Data Science Lab">
         <p>Dados, protocolo temporal, comparação de modelos, ablação de features, calibração, explicabilidade e limites. Código e relatório em <a href={REPO} target="_blank" rel="noreferrer">GitHub</a>.</p>
-      </div></div>
+        <div className="meta"><span>todos os números vêm dos artefatos gerados pela execução real do pipeline</span></div>
+      </Cabecalho>
 
-      <div className="grade g4">
+      <div className="grade g4 kpis">
         <div className="card kpi"><div className="rot">Transações</div><div className="val">{fmt.num(ing?.bronze?.linhas)}</div><div className="def">Sparkov (CC0) · {q ? `${fmt.num(Number(q.cartoes))} cartões, ${fmt.num(Number(q.merchants))} lojas` : "N/D"} · SHA-256 conferido na ingestão</div></div>
         <div className="card kpi"><div className="rot">Fraude no teste</div><div className="val">{fmt.pct(r.teste[r.champion].prevalencia, 2)}</div><div className="def">linha de base da curva PR (o acaso)</div></div>
         <div className="card kpi"><div className="rot">AP do Champion (teste)</div><div className="val">{r.teste[r.champion].AP.toFixed(3)}</div><div className="def">{r.champion}</div></div>
@@ -86,15 +86,15 @@ export default function Lab() {
         <div className="card">
           <h2>Calibração</h2>
           <Grafico data={[
-            { type: "scatter", mode: "lines+markers", name: "bruto", x: c.calibracao.bruto.previsto, y: c.calibracao.bruto.observado, line: { color: "#94a3b8" } },
-            { type: "scatter", mode: "lines+markers", name: `calibrado (${r.calibracao.escolhida})`, x: c.calibracao.calibrado.previsto, y: c.calibracao.calibrado.observado, line: { color: "#22c55e" } },
+            { type: "scatter", mode: "lines+markers", name: "bruto", x: c.calibracao.bruto.previsto, y: c.calibracao.bruto.observado, line: { color: "#94a3B8" } },
+            { type: "scatter", mode: "lines+markers", name: `calibrado (${r.calibracao.escolhida})`, x: c.calibracao.calibrado.previsto, y: c.calibracao.calibrado.observado, line: { color: COR.protecao } },
             { type: "scatter", mode: "lines", name: "perfeito", x: [1e-5, 1], y: [1e-5, 1], line: { dash: "dot", color: "#7d8a9a" } },
           ]} layout={{ xaxis: { type: "log", title: { text: "probabilidade prevista" } }, yaxis: { type: "log", title: { text: "fraude observada" } } }} />
           <p className="nota">Brier no teste: bruto {r.calibracao.brier_teste.bruto.toFixed(5)} → calibrado {r.calibracao.brier_teste.calibrado.toFixed(5)}. Calibrador ajustado na janela calibration e escolhido (isotônico × sigmoide) na janela policy.</p>
         </div>
         <div className="card">
           <h2>O que mais pesa (SHAP global)</h2>
-          <Grafico data={[{ type: "bar", orientation: "h", x: shap.map(([, v]) => v), y: shap.map(([k]) => DESC[k] || k.replace("cat_", "categoria: ")), marker: { color: "#3b82f6" } }]}
+          <Grafico data={[{ type: "bar", orientation: "h", x: shap.map(([, v]) => v), y: shap.map(([k]) => DESC[k] || k.replace("cat_", "categoria: ")), marker: { color: COR.intel } }]}
             layout={{ margin: { l: 150, r: 10, t: 10, b: 40 }, xaxis: { title: { text: "média |SHAP| (log-odds do modelo bruto)" } } }} />
           <p className="nota">Explica o modelo, não a causa da fraude.</p>
         </div>
@@ -109,6 +109,7 @@ export default function Lab() {
               <tr className="destaque"><td>Champion completo</td><td className="n mono">{B.AP.toFixed(4)}</td><td className="n">{fmt.pct(B.recall_fpr_1pct)}</td></tr>
               <tr><td>C1: sem features de valor</td><td className="n mono">{r.experimento_C_sem_valor.C1_sem_valor.teste.AP.toFixed(4)}</td><td className="n">{fmt.pct(r.experimento_C_sem_valor.C1_sem_valor.teste.recall_fpr_1pct)}</td></tr>
               <tr><td>C2: sem valor e sem rajada</td><td className="n mono">{r.experimento_C_sem_valor.C2_sem_valor_e_rajada.teste.AP.toFixed(4)}</td><td className="n">{fmt.pct(r.experimento_C_sem_valor.C2_sem_valor_e_rajada.teste.recall_fpr_1pct)}</td></tr>
+              <tr><td>C4: sem tamanho do histórico e sem tempo desde a última</td><td className="n mono">{r.experimento_C_sem_valor.C4_sem_historico_curto.teste.AP.toFixed(4)}</td><td className="n">{fmt.pct(r.experimento_C_sem_valor.C4_sem_historico_curto.teste.recall_fpr_1pct)}</td></tr>
               <tr><td>C3: Champion só em compras &lt; US$ 800</td><td className="n mono">{r.experimento_C_sem_valor.C3_champion_abaixo_800.teste.AP.toFixed(4)}</td><td className="n">{fmt.pct(r.experimento_C_sem_valor.C3_champion_abaixo_800.teste.recall_fpr_1pct)}</td></tr>
             </tbody></table>
         </div>
