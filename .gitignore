@@ -21,3 +21,6 @@ docs/ESPECIFICACAO.md
 *.tsbuildinfo
 reports/metrics/train_log.txt
 video/_build/
+
+# registros com detalhes de infraestrutura (só local)
+docs/privado/

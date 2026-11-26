@@ -293,7 +293,7 @@ Comandos `make`: ingest, features, snapshot, train, mlflow, test, up, load e dem
 
 ## 13. Desafios, erros e incidentes (em ordem)
 
-1. **Funções do BestByBrasil apagadas por engano (antes do projeto).** Um comando foi interrompido tarde. As 9 funções foram recriadas, com o código e a configuração exatos do log de auditoria. Registro em `bbb-agente/base/docs/RECRIACAO-FUNCOES-2026-11-26.md`.
+1. **Funções de outro projeto apagadas por engano (antes deste projeto).** Um comando foi interrompido tarde. As funções foram recriadas, com o código e a configuração exatos do log de auditoria. Lição: ação destrutiva só com confirmação explícita.
 2. **Ferramentas:**
    - o CLI do Kaggle estava quebrado;
    - o `dbdate` do Parquet não era reconhecido;

@@ -81,7 +81,7 @@ services:
               "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--artifacts-destination", "/mlflow/artifacts", "--serve-artifacts",
               "--workers", "1"]
     volumes: [./artifacts/mlflow:/mlflow]
-    ports: ["127.0.0.1:5005:5000"]      # só via túnel SSH: ssh -L 5005:127.0.0.1:5005 root@VPS
+    ports: ["127.0.0.1:5005:5000"]      # só via túnel SSH: ssh -L 5005:127.0.0.1:5005 <usuario>@<vps>
     mem_limit: 350m
     cpus: 0.3
     restart: unless-stopped

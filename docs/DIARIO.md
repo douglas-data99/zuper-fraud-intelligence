@@ -13,8 +13,7 @@ Registro contínuo de etapas, decisões, dúvidas e dificuldades. Ele serve de b
 - **Custo:**
   - BigQuery limitado a R$ 50 no projeto `zuper-fraud-intelligence`, com cota de 20 GiB/dia;
   - o modelo **não** roda no BigQuery;
-  - BestByBrasil com custo zero (agendamentos pausados);
-  - Zupfy encerrado.
+  - outros projetos da conta com custo zero.
 
 ## Plano de etapas
 
@@ -105,8 +104,7 @@ Registro contínuo de etapas, decisões, dúvidas e dificuldades. Ele serve de b
   - nenhuma transação, perfil ou contador passou pela API pública nesse intervalo;
   - o loader roda num contêiner só na rede interna e escreveu no nosso Redis.
 - **Correção:** o nosso Redis passou a ter o nome único `zfi-redis`, e todo `REDIS_URL` aponta para ele. Confirmado: o comando agora cai no nosso Redis.
-- **Pendente para o Douglas:** o classificador de segurança me impediu (corretamente) de acessar o Redis do WhatsApp para conferir e limpar. Se quiser remover a chave órfã, que é pequena e não interfere na Evolution, porque a Evolution não usa o prefixo `fraud:`:
-  `docker exec evolution-redis-1 redis-cli DEL fraud:replay:comando` (e o mesmo em `evolution-prospect-prospect-redis-1`, se existir lá).
+- **Pendente para o Douglas:** o classificador de segurança me impediu (corretamente) de acessar o Redis do outro serviço para conferir e limpar. A chave órfã é pequena e não interfere (o outro serviço não usa o prefixo `fraud:`). O comando de limpeza está no registro privado.
 - **Lição:** em rede compartilhada, nunca usar nome de serviço genérico. Registrada também em `docs/architecture.md`.
 
 ### E2: revisão (2 rodadas) → APROVADO

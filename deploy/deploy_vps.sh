@@ -4,8 +4,10 @@
 # Uso: bash deploy/deploy_vps.sh <host_api>   ex.: api-fraude.zuperdata.com.br
 set -euo pipefail
 HOST_API="${1:?informe o host público da API}"
-VPS="root@2.29.40.32"
-KEY="$HOME/.ssh/zuper_vps"
+VPS="${VPS:?defina VPS=usuario@host}"
+KEY="${KEY:?defina KEY=caminho da chave SSH}"
+CADDYFILE="${CADDYFILE:?defina CADDYFILE=caminho do Caddyfile na VPS}"
+CADDY="${CADDY:?defina CADDY=nome do contêiner do Caddy}"
 DEST="/opt/zuper-fraud"
 cd "$(dirname "$0")/.."
 
@@ -24,10 +26,10 @@ echo "== carregando snapshot no Redis"
 ssh -i "$KEY" "$VPS" "cd $DEST && docker compose run --rm loader"
 
 echo "== Caddy: bloco novo (backup antes), validação e reload"
-ssh -i "$KEY" "$VPS" "set -e; F=/opt/evolution/Caddyfile; cp \$F \$F.bak-\$(date +%Y%m%d%H%M%S);
+ssh -i "$KEY" "$VPS" "set -e; F=$CADDYFILE; cp \$F \$F.bak-\$(date +%Y%m%d%H%M%S);
   if ! grep -q 'zuper-fraud' \$F; then printf '\n# Zuper Fraud Intelligence (/opt/zuper-fraud), desde 26/11/2026\n%s {\n\tencode gzip\n\treverse_proxy zfi-api:8000\n}\n' '$HOST_API' >> \$F; fi;
-  docker exec evolution-caddy-1 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile &&
-  docker exec evolution-caddy-1 caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile"
+  docker exec $CADDY caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile &&
+  docker exec $CADDY caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile"
 
 echo "== teste"
 curl -fsS "https://$HOST_API/health" && echo

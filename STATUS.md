@@ -40,11 +40,8 @@
 ## Pendências para o Douglas (precisam de você)
 
 1. ~~DNS na Hostinger~~ feito em 26/11: `fraude-analytics` (Vercel) e `api-fraude` (VPS, Caddy com HTTPS). O endereço antigo `zuper-fraud-intelligence.vercel.app` continua funcionando.
-2. **Chave órfã no Redis do WhatsApp** (incidente explicado no DIARIO). Opcional, porque a chave é pequena e não interfere:
-   `docker exec evolution-redis-1 redis-cli DEL fraud:replay:comando`
-3. **Commit no repositório SITES:**
-   - a pasta `zuperdata_site/douglas-portifolio/` já está no ar, mas sem commit;
-   - também estão sem commit as funções do BestByBrasil em `Infinity/docs/etl` (as de 14/11).
+2. **Chave órfã no Redis de outro serviço da VPS** (incidente explicado no DIARIO). Opcional, porque a chave é pequena e não interfere. O comando está no registro privado.
+3. **Commits pendentes em outros repositórios** (lista no registro privado).
 4. **Indexação do portfólio no Google:** ele está com `noindex`. Se quiser aparecer no Google, eu tiro.
 5. **Antes da entrevista:** rodar `docker compose run --rm loader` na VPS. Assim os 3 cenários voltam a reproduzir o resultado da seleção, porque transações feitas na demo adiantam o histórico do cartão.
 
