@@ -43,3 +43,6 @@
 .semOcorrencia { font-size: var(--t-sm); color: var(--ink-3); margin-top: 16px; }
 .semOcorrencia b { color: var(--ink-2); font-weight: 500; }
 @media (max-width: 640px) { .achado { grid-template-columns: 1fr; gap: 4px; } }
+
+.codigo { display: block; font-family: var(--mono); font-size: var(--t-xs); color: var(--ink-3); font-weight: 400; margin: 2px 0 0 16px; }
+.linhaTeste td { color: var(--ink); border-bottom-color: var(--line-forte); }

@@ -31,7 +31,12 @@ export default function Lab() {
   const shap = Object.entries<number>(r.shap_top).slice(0, 12).reverse();
   const splits = Object.entries<any>(r.splits);
   const A = r.ablacao_A_vs_B_teste.A, B = r.ablacao_A_vs_B_teste.B;
-  const FUNCAO: Record<string, string> = { train: "ajuste dos modelos", tuning: "early stopping, Optuna, escolha do Champion", calibration: "calibrador de probabilidade", policy: "cortes da política de custo", test: "avaliação final, intocada" };
+  const FUNCAO: Record<string, string> = { train: "o modelo aprende os padrões", tuning: "qual modelo vence e com quais ajustes (Optuna, early stopping)", calibration: "como transformar o score em probabilidade", policy: "quais cortes de decisão custam menos", test: "nada: só mede o resultado final" };
+  const ETAPA: Record<string, { nome: string; tipo: "treino" | "validacao" | "teste" }> = {
+    train: { nome: "Treino", tipo: "treino" }, tuning: { nome: "Validação 1", tipo: "validacao" }, calibration: { nome: "Validação 2", tipo: "validacao" },
+    policy: { nome: "Validação 3", tipo: "validacao" }, test: { nome: "Teste final", tipo: "teste" } };
+  const ONDE: Record<string, string> = { train: "", tuning: "Data Science Lab", calibration: "Data Science Lab", policy: "Motor de decisão", test: "Centro de operações e Monitoramento" };
+  const dataBr = (iso: string) => iso.slice(0, 10).split("-").reverse().join("/");
   const COR_JANELA: Record<string, string> = { train: "#2C3A4D", tuning: COR.intel, calibration: "#9C8BD9", policy: COR.atencao, test: COR.protecao };
   const totalN = splits.reduce((s, [, v]) => s + v.n, 0);
   const ch = r.teste[r.champion];
@@ -62,7 +67,7 @@ export default function Lab() {
       </section>
 
       <section className="bloco">
-        <div className="lado"><h2>Protocolo temporal</h2><p>O modelo aprende com o passado e é cobrado no futuro. Cada janela tem uma só função, e o teste só foi lido depois de modelo, calibrador e política salvos.</p></div>
+        <div className="lado"><h2>Protocolo temporal</h2><p>O modelo aprende com o passado e é cobrado no futuro. Uma janela de treino, três de validação (cada uma decide uma coisa) e o teste, lido só depois de modelo, calibrador e cortes salvos.</p></div>
         <div className="corpo">
           <div className={l.linhaTempo} role="img" aria-label="Proporção de transações por janela temporal">
             {splits.map(([k, v]) => (
@@ -70,11 +75,15 @@ export default function Lab() {
             ))}
           </div>
           <div className="tabela-rolar"><table>
-            <thead><tr><th>Janela</th><th>Função</th><th>Início</th><th>Fim</th><th className="n">Transações</th><th className="n">Fraudes</th></tr></thead>
+            <thead><tr><th>Etapa</th><th>O que se decide aqui</th><th>Período</th><th className="n">Transações</th><th className="n">Fraudes</th><th>Onde aparece</th></tr></thead>
             <tbody>{splits.map(([k, v]) => (
-              <tr key={k}><td><span className={l.marca} style={{ background: COR_JANELA[k] }} /><span className="mono">{k}</span></td><td>{FUNCAO[k]}</td>
-                <td>{v.inicio.slice(0, 10)}</td><td>{v.fim.slice(0, 10)}</td><td className="n">{fmt.num(v.n)}</td><td className="n">{fmt.num(v.fraudes)}</td></tr>
+              <tr key={k} className={ETAPA[k]?.tipo === "teste" ? l.linhaTeste : undefined}>
+                <td style={{ whiteSpace: "nowrap" }}><span className={l.marca} style={{ background: COR_JANELA[k] }} /><b>{ETAPA[k]?.nome ?? k}</b><small className={l.codigo}>{k}</small></td>
+                <td>{FUNCAO[k]}</td>
+                <td style={{ whiteSpace: "nowrap" }}>{dataBr(v.inicio)} a {dataBr(v.fim)}</td><td className="n">{fmt.num(v.n)}</td><td className="n">{fmt.num(v.fraudes)}</td>
+                <td>{ONDE[k]}</td></tr>
             ))}</tbody></table></div>
+          <p className="nota">Quando o site fala em <b>janela de validação</b> sem dizer qual, é a Validação 3 (policy), onde os cortes são escolhidos e onde o Motor de decisão deixa você testar outros cortes. Os números oficiais ficam sempre no teste final.</p>
           <p className="nota">Janeiro de 2019 só aquece o histórico. Features point-in-time: toda janela de comportamento termina 1 segundo antes da transação, conferido por revisão independente e pelo teste de paridade entre offline e online.</p>
         </div>
       </section>

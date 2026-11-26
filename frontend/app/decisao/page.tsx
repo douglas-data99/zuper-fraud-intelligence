@@ -94,7 +94,7 @@ export default function Decisao() {
     <>
       <Cabecalho eyebrow="Negócio, política de risco" titulo="Motor de decisão">
         <p>O modelo estima o risco; o motor decide a ação. Mova os cortes e as premissas e veja como perda com fraude, custo de análise e atrito com clientes bons se compensam. Mudar o corte não muda o modelo: muda só a operação.</p>
-        <div className="meta"><span className="selo premissa">janela de validação</span><span>{fmt.num(d.n_real)} transações de 01/05 a 21/06/2020</span><span>o período de teste usa a política congelada e não é ajustável</span></div>
+        <div className="meta"><span className="selo premissa">validação 3 (policy)</span><span>{fmt.num(d.n_real)} transações de 01/05 a 21/06/2020, onde os cortes foram escolhidos</span><span>os números oficiais (teste) ficam no Centro de operações e no bloco do fim desta página</span></div>
       </Cabecalho>
 
       <div className={e.bancada}>
@@ -126,7 +126,7 @@ export default function Decisao() {
         <div className={e.resultado}>
           <section className={e.manchete}>
             <div>
-              <div className={e.rot}>Benefício líquido contra aprovar tudo</div>
+              <div className={e.rot}>Benefício líquido contra aprovar tudo, na validação 3 (01/05 a 21/06/2020)</div>
               <div className={`cifra xl ${beneficio >= 0 ? "protecao" : "risco"}`}>{fmt.usd(beneficio)}</div>
               <div className="legenda">
                 {congelada ? "Política congelada com as premissas atuais." :
@@ -180,7 +180,7 @@ export default function Decisao() {
             </div>
             {champ && (
               <div>
-                <div className={e.secaoCab}><h2>Onde a política está na curva</h2><p>Curva precisão × recall do Champion no teste; o ponto é a sua política na janela de validação.</p></div>
+                <div className={e.secaoCab}><h2>Onde a política está na curva</h2><p>Curva precisão × recall do Champion no teste; o ponto é a sua política na validação 3 (policy).</p></div>
                 <Grafico altura={260} data={[
                   { type: "scatter", mode: "lines", x: champ.recall, y: champ.precision, name: "Champion (teste)", line: { color: COR.intel, width: 2 } },
                   { type: "scatter", mode: "markers", x: [rec], y: [prec], name: "seus cortes", marker: { size: 12, color: COR.atencao, line: { color: "#0A0F16", width: 2 } } },
@@ -210,7 +210,7 @@ export default function Decisao() {
               ))}
             </tbody></table></div>
           <h3 className={e.subTit}>Sensibilidade dos cortes às premissas</h3>
-          <p className="nota" style={{ marginTop: 0 }}>Cortes reotimizados na janela de validação quando cada premissa muda.</p>
+          <p className="nota" style={{ marginTop: 0 }}>Cortes reotimizados na validação 3 (policy) quando cada premissa muda.</p>
           <div className="tabela-rolar"><table>
             <thead><tr><th>Cenário</th><th className="n">Verificar a partir de</th><th className="n">Investigar a partir de</th><th className="n">% verificar</th><th className="n">% investigar</th><th className="n">Custo</th></tr></thead>
             <tbody>{Object.entries<any>(res.politica.sensibilidade).map(([k, v]) => (
